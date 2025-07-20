@@ -75,11 +75,12 @@ export function createMetricCards(data: any[], fields: string[]): MetricCard[] {
   return fields.map((field) => {
     const values = data.map((item) => item[field]).filter((val) => typeof val === "number")
     const average = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0
-
+    let format: MetricCard["format"] = "decimal"
+    if (field === "avg_perplexity_score") format = "percentage"
     return {
       title: field.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
       value: average,
-      format: "decimal", // Changed from percentage to decimal for all scores
+      format,
     }
   })
 }

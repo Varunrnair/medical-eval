@@ -93,7 +93,6 @@ class SemanticAnalyzer:
         bert_f1s = []
         langs = []
         semantic_scores = []
-        vyakyarth_semantic_scores = []
 
         for ref, cand in zip(self.references, self.candidates):
             lang = self._detect_language(ref)
@@ -126,6 +125,5 @@ class SemanticAnalyzer:
             "avg_bert_score_f1": np.mean(self.df["bert_score_f1"]),
             "avg_vyakyarth_similarity": np.mean(self.df["vyakyarth_similarity"]),
             "avg_semantic_similarity": np.mean(self.df["semantic_similarity"]),
-            "avg_vyakyarth_semantic_score": np.mean(self.df["vyakyarth_semantic_score"])
         }
         pd.DataFrame([summary]).to_csv(summary_path, index=False)

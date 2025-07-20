@@ -6,7 +6,7 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
 
-INPUT_DATASET_PATH = "/Users/vrn/Work/medical_eval/backend/data/sakhi.csv"
+INPUT_DATASET_PATH = "/Users/vrn/Work/medical_eval/backend/data/sample_15.csv"
 LLM_RESPONSES_OUTPUT_PATH =  "/Users/vrn/Work/medical_eval/frontend/public/llm_responses.csv"
 LINGUISTIC_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/linguistic_scored_dataset.csv"
 LINGUISTIC_SUMMARY_PATH = "/Users/vrn/Work/medical_eval/frontend/public/linguistic_detailed_scores.csv"

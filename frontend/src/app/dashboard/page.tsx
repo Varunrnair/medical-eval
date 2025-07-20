@@ -45,7 +45,7 @@ export default function DashboardPage() {
 
   const linguisticMetrics = useMemo(() => {
     if (linguisticData.length === 0) return []
-    return createMetricCards(linguisticData, ["avg_bleu_score", "avg_meteor_score", "avg_rouge_l_score"])
+    return createMetricCards(linguisticData, ["avg_bleu_score", "avg_meteor_score", "avg_rouge_l_score", "avg_perplexity_score"])
   }, [linguisticData])
 
   const allMetricsChart = useMemo(() => {

@@ -96,6 +96,8 @@ class LinguisticAnalyzer:
 
 
     def save_updated_dataset(self, output_path: str):
+        avg_perplexity = float(np.mean(self.df["perplexity"]))
+        self.df["avg_perplexity_score"] = avg_perplexity
         self.df.to_csv(output_path, index=False)
 
 

@@ -65,93 +65,121 @@ class MedicalQualityEvaluator:
 
 
     def generate_rubrics(self, question: str, gold_answer: str) -> List[str]:
-        """Fixed rubric generation with proper numbered parsing"""
-        prompt = f"""You are analyzing a set of high-quality, gold-standard medical answers.  
-                Your task is to extract the key themes and recurring qualities that make these responses effective and reliable.
+        """Enhanced rubric generation with JSON output and broader medical scope"""
+        prompt = f"""You are analyzing high-quality medical responses across all areas of healthcare including women's health, reproductive health, mental health, chronic conditions, preventive care, and general medical topics.
 
-                Question: {question}
-                Gold Standard Answer: {gold_answer}
+Your task is to extract key themes and qualities that make medical responses effective, reliable, and helpful to patients.
 
-                Instructions:
-                - Carefully study the medical content, tone, and structure of the answers.  
-                - Identify specific patterns related to medical accuracy, clarity, completeness, and patient-centered communication.  
-                - Focus on how the answers provide guidance, manage uncertainty, simplify technical concepts, and support the user.
+Question: {question}
+Gold Standard Answer: {gold_answer}
 
-                Your Output:
-                Extract 15 to 20 distinct, high-level themes that consistently appear across the answers.  
-                Each theme must be written as a precise, actionable statement that captures a key characteristic of effective medical QA.  
-                Do NOT summarize or generalize. Instead, describe each theme clearly and concretely.
+Instructions:
+- Study the medical content, tone, structure, and approach used in the gold standard answer
+- Identify patterns related to medical accuracy, clarity, completeness, patient safety, and supportive communication
+- Focus on how the answer provides guidance, manages uncertainty, explains medical concepts, addresses patient concerns, and maintains professional standards
+- Consider all aspects of healthcare delivery including sensitive topics, preventive care, treatment options, and patient education
 
-                EXAMPLE FORMAT:
-                1. Provides evidence-based medical information
-                2. Uses accessible language while maintaining accuracy
-                3. Addresses patient safety concerns explicitly
-                4. Acknowledges limitations and uncertainty when appropriate
+Generate 15-20 distinct evaluation criteria that capture what makes this a high-quality medical response. Each criterion should be:
+- Specific and actionable
+- Applicable to medical question-answering
+- Focused on one clear aspect of quality
+- Written as a clear statement describing what good responses should do
 
-                Return only the numbered list of themes (1-20 or fewer if appropriate)."""
+IMPORTANT: Return ONLY a JSON array of strings. No explanations, no numbering, no additional text - just the raw JSON array.
+
+Example format:
+["Provides evidence-based medical information", "Uses accessible language while maintaining accuracy", "Addresses patient safety concerns explicitly"]
+
+JSON Response:"""
 
         response = self.call_llm(prompt, max_tokens=600, temperature=0.3)
         if not response:
             return []
-        rubrics = []
-        for line in response.split('\n'):
-            line = line.strip()
-            if re.match(r'^\d+\.', line) and len(line) > 10:
-                # Remove the number and dot at the beginning
-                rubric = re.sub(r'^\d+\.\s*', '', line)
-                rubrics.append(rubric)
-        if len(rubrics) < 5:
-            print(f"Warning: Only {len(rubrics)} rubrics generated, expected 15-20")
-        return rubrics
+        
+        try:
+            # Extract JSON from response
+            json_start = response.find('[')
+            json_end = response.rfind(']') + 1
+            if json_start != -1 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                rubrics = json.loads(json_str)
+                
+                # Validate that we got a list of strings
+                if isinstance(rubrics, list) and all(isinstance(r, str) for r in rubrics):
+                    if len(rubrics) < 10:
+                        print(f"Warning: Only {len(rubrics)} rubrics generated, expected 15-20")
+                    return rubrics
+                else:
+                    print("Warning: Invalid rubrics format received")
+                    return []
+            else:
+                print("Warning: No JSON array found in rubrics response")
+                return []
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error in rubric generation: {e}")
+            return []
 
 
     def score_rubrics(self, question: str, llm_response: str, rubrics: List[str]) -> Dict[str, int]:
-        """Fixed: Removed gold_answer parameter to match method signature"""
-        rubrics_prompt = "\n".join([f'- criterion {i+1}: {rubric}' for i, rubric in enumerate(rubrics)])
-        rubric_key_map = {f"criterion {i+1}": rubric for i, rubric in enumerate(rubrics)}
-        prompt = f"""You are an expert evaluator assessing AI-generated medical responses against specific quality criteria.
+        """Enhanced rubric scoring with clear JSON output format"""
+        rubrics_json = json.dumps(rubrics, indent=2)
+        
+        prompt = f"""You are an expert medical evaluator assessing AI-generated responses against specific quality criteria.
 
-                Question Context:
-                \"\"\"{question}\"\"\"
+Question Context:
+"{question}"
 
-                LLM Response to Evaluate:
-                \"\"\"{llm_response}\"\"\"
+LLM Response to Evaluate:
+"{llm_response}"
 
-                Evaluation Task:
-                For each criterion below, determine if the LLM response fully satisfies the requirement. Score 1 if the criterion is clearly met, 0 if not met or ambiguous.
+Evaluation Criteria:
+{rubrics_json}
 
-                Criteria:
-                {rubrics_prompt}
+Scoring Task:
+For each criterion, determine if the LLM response fully satisfies that requirement:
+- Score 1: The response clearly and adequately meets this criterion
+- Score 0: The response fails to meet this criterion, is insufficient, or is ambiguous
 
-                Scoring Instructions:
-                - 1: The response clearly and unambiguously meets this criterion
-                - 0: The response fails to meet this criterion or is ambiguous/insufficient
+Scoring Guidelines:
+- Be thorough but fair in your evaluation
+- Consider the medical context and patient needs
+- Look for evidence that each criterion is specifically addressed
+- If a criterion is partially met but not completely, score it as 0
 
-                EXAMPLE OUTPUT FORMAT:
-                {{
-                "criterion 1": 1,
-                "criterion 2": 0,
-                "criterion 3": 1,
-                "criterion 4": 1,
-                "criterion 5": 0
-                }}
+IMPORTANT: Return ONLY a JSON object where:
+- Keys are the exact rubric text (as provided above)
+- Values are either 0 or 1
+- Include ALL rubrics in your response
+- No explanations, no additional text, no markdown - just the raw JSON object
 
-                IMPORTANT: Output ONLY the JSON object above with your actual scores. No explanations, no additional text, no markdown formatting - just the raw JSON.
-                """
-        response = self.call_llm(prompt, max_tokens=600, temperature=0.1)
+JSON Response:"""
+
+        response = self.call_llm(prompt, max_tokens=800, temperature=0.1)
         if not response:
             return {}
+        
         try:
             json_start = response.find('{')
             json_end = response.rfind('}') + 1
             if json_start != -1 and json_end > json_start:
                 json_str = response[json_start:json_end]
-                raw_scores = json.loads(json_str)
-                mapped_scores = {rubric_key_map[k]: v for k, v in raw_scores.items() if k in rubric_key_map}
-                if len(mapped_scores) != len(rubrics):
-                    print(f"Warning: Only {len(mapped_scores)}/{len(rubrics)} rubrics were scored")  
-                return mapped_scores
+                scores = json.loads(json_str)
+                
+                # Validate scores format
+                valid_scores = {}
+                for rubric in rubrics:
+                    if rubric in scores and scores[rubric] in [0, 1]:
+                        valid_scores[rubric] = scores[rubric]
+                    else:
+                        print(f"Warning: Missing or invalid score for rubric: {rubric[:50]}...")
+                        valid_scores[rubric] = 0  # Default to 0 for missing scores
+                
+                if len(valid_scores) != len(rubrics):
+                    print(f"Warning: Only {len(valid_scores)}/{len(rubrics)} rubrics were properly scored")
+                
+                return valid_scores
             else:
+                print("Warning: No JSON object found in scoring response")
                 return {}
         except json.JSONDecodeError as e:
             print(f"JSON decode error in rubric scoring: {e}")
@@ -159,45 +187,81 @@ class MedicalQualityEvaluator:
 
 
     def classify_rubrics_to_axes(self, rubrics: List[str]) -> Dict[str, List[str]]:
-        """Enhanced rubric classification with validation"""
-        axes_desc = "\n".join([f"{axis}: {desc}" for axis, desc in self.axis_descriptions.items()])
-        rubrics_text = "\n".join([f"- {rubric}" for rubric in rubrics])
+        """Enhanced rubric classification with strict requirements and fallback handling"""
+        axes_desc = "\n".join([f"- {axis}: {desc}" for axis, desc in self.axis_descriptions.items()])
+        rubrics_json = json.dumps(rubrics, indent=2)
         
-        prompt = f"""You are given a set of evaluation rubrics and a list of predefined axes. 
-                Your task is to assign **every rubric** to **exactly one** axis based on the most appropriate conceptual alignment. 
-                Do not leave any rubric unclassified or assign it to multiple axes.
+        prompt = f"""You are classifying evaluation rubrics into predefined quality dimensions for medical response assessment.
 
-                Available Axes (with descriptions):
-                {axes_desc}
+Available Quality Dimensions:
+{axes_desc}
 
-                Rubrics to classify:
-                {rubrics_text}
+Rubrics to Classify:
+{rubrics_json}
 
-                Instructions:
-                - Each rubric **must** be assigned to **one and only one** axis.
-                - Return your output strictly as a **valid JSON object**.
-                - The JSON format should be: {{ "Axis1": [rubric1, rubric2], "Axis2": [...], ... }}
-                - Ensure that **all input rubrics appear exactly once** in the JSON output.
-                - Do not invent new axes or modify rubric text.
-                - Only use the axes listed above as keys.
+Classification Rules:
+- EVERY rubric MUST be assigned to exactly ONE dimension
+- Choose the MOST APPROPRIATE dimension for each rubric - don't overthink the perfect fit
+- If a rubric could fit multiple dimensions, pick the best match and move on
+- If you're unsure about a rubric, make a reasonable judgment call rather than leaving it unclassified
+- It's better to have a slightly imperfect classification than to leave rubrics unassigned
 
-                IMPORTANT: If you're unsure where a rubric fits best, make a reasonable choice—it must still be classified. No rubric should be left out.
+Your task:
+Assign each rubric to its most appropriate dimension. Be decisive and ensure complete coverage.
 
-                Now return the classification JSON object:
-                """
+IMPORTANT: Return ONLY a JSON object where:
+- Keys are the exact dimension names from above
+- Values are arrays of rubric strings that belong to that dimension
+- Every rubric from the input list must appear exactly once
+- Include an "unclassified" key with an empty array (it should remain empty if you follow the rules)
 
-        response = self.call_llm(prompt, max_tokens=800, temperature=0.1)
+Example format:
+{{
+  "Dimension1": ["rubric text 1", "rubric text 2"],
+  "Dimension2": ["rubric text 3"],
+  "unclassified": []
+}}
+
+JSON Response:"""
+
+        response = self.call_llm(prompt, max_tokens=1000, temperature=0.1)
         if not response:
             return {}
+        
         try:
-            json_start, json_end = response.find('{'), response.rfind('}') + 1
-            classification = json.loads(response[json_start:json_end])
-            final_classification = {axis: classification.get(axis, []) for axis in self.selected_axes}
-            classified_rubrics = [rubric for rubric_list in final_classification.values() for rubric in rubric_list]
-            missing_rubrics = [r for r in rubrics if r not in classified_rubrics]
-            if missing_rubrics:
-                print(f"Warning: {len(missing_rubrics)} rubrics were not classified: {missing_rubrics[:3]}...")
-            return final_classification
+            json_start = response.find('{')
+            json_end = response.rfind('}') + 1
+            if json_start != -1 and json_end > json_start:
+                json_str = response[json_start:json_end]
+                classification = json.loads(json_str)
+                
+                # Validate and fix classification
+                final_classification = {}
+                
+                # Initialize with empty lists for all axes plus unclassified
+                for axis in self.selected_axes:
+                    final_classification[axis] = classification.get(axis, [])
+                final_classification["unclassified"] = classification.get("unclassified", [])
+                
+                # Check which rubrics were classified
+                classified_rubrics = []
+                for rubric_list in final_classification.values():
+                    classified_rubrics.extend(rubric_list)
+                
+                # Find missing rubrics and assign them to unclassified
+                missing_rubrics = [r for r in rubrics if r not in classified_rubrics]
+                if missing_rubrics:
+                    print(f"Warning: {len(missing_rubrics)} rubrics were not classified, adding to unclassified")
+                    final_classification["unclassified"].extend(missing_rubrics)
+                
+                # Report classification results
+                total_classified = sum(len(rubrics_list) for rubrics_list in final_classification.values())
+                print(f"Classification complete: {total_classified} total assignments, {len(final_classification['unclassified'])} unclassified")
+                
+                return final_classification
+            else:
+                print("Warning: No JSON object found in classification response")
+                return {}
         except json.JSONDecodeError as e:
             print(f"JSON decode error in rubric classification: {e}")
             return {}
@@ -207,6 +271,9 @@ class MedicalQualityEvaluator:
         """Enhanced axis score calculation with validation"""
         axis_scores = {}
         for axis, rubrics in classification.items():
+            if axis == "unclassified":
+                continue  # Skip unclassified rubrics in scoring
+                
             valid_rubrics = [rubric_scores[r] for r in rubrics if r in rubric_scores]
             if valid_rubrics:
                 axis_scores[axis] = sum(valid_rubrics) / len(valid_rubrics)
@@ -223,55 +290,51 @@ class MedicalQualityEvaluator:
 
 
     def run_and_update_scores(self) -> None:
-        """Fixed main evaluation loop with proper data alignment"""
+        """Enhanced main evaluation loop with better error handling"""
         medical_scores = []
         detailed_rows = []
         
         print(f"Processing {len(self.df)} rows...")
         
         for idx, row in self.df.iterrows():
-            question, gold_answer, llm_response = row['Questions'], row['Answer'], row['llm_response']
-            
-            # Progress tracking
             if idx % 10 == 0:
                 print(f"Processing row {idx}/{len(self.df)}")
-            
-            # Generate rubrics
-            rubrics = self.generate_rubrics(question, gold_answer)
-            if not rubrics:
-                print(f"Warning: No rubrics generated for row {idx}")
-                medical_scores.append(0.0)  # Handle failed cases
+            try:
+                question_val = row.at['Questions'] if 'Questions' in row else ''
+                gold_answer_val = row.at['Answer'] if 'Answer' in row else ''
+                llm_response_val = row.at['llm_response'] if 'llm_response' in row else ''
+                question = str(question_val) if not pd.isna(question_val) else ""
+                gold_answer = str(gold_answer_val) if not pd.isna(gold_answer_val) else ""
+                llm_response = str(llm_response_val) if not pd.isna(llm_response_val) else ""
+                rubrics = self.generate_rubrics(question, gold_answer)
+                if not rubrics:
+                    medical_scores.append(0.0)
+                    continue
+                rubric_scores = self.score_rubrics(question, llm_response, rubrics)
+                if not rubric_scores:
+                    medical_scores.append(0.0)
+                    continue
+                classification = self.classify_rubrics_to_axes(rubrics)
+                if not any(classification[axis] for axis in self.selected_axes):
+                    medical_scores.append(0.0)
+                    continue
+                axis_scores = self.calculate_axis_scores(rubric_scores, classification)
+                medical_score = self.calculate_medical_quality_score(axis_scores)
+                medical_scores.append(medical_score)
+                detailed_rows.append({
+                    'question': question,
+                    'gold_standard_answer': gold_answer,
+                    'llm_response': llm_response,
+                    'rubrics': json.dumps(rubrics),
+                    'rubric_scores': json.dumps(rubric_scores),
+                    'classification': json.dumps(classification),
+                    'axis_scores': json.dumps(axis_scores),
+                    'medical_quality_score': medical_score
+                })
+            except Exception as e:
+                print(f"Error processing row {idx}: {e}")
+                medical_scores.append(0.0)
                 continue
-            
-            # Fixed: Remove gold_answer parameter
-            rubric_scores = self.score_rubrics(question, llm_response, rubrics)
-            if not rubric_scores:
-                print(f"Warning: No rubric scores generated for row {idx}")
-                medical_scores.append(0.0)  # Handle failed cases
-                continue
-            
-            # Classify rubrics to axes
-            classification = self.classify_rubrics_to_axes(rubrics)
-            if not any(classification.values()):
-                print(f"Warning: No rubric classification for row {idx}")
-                medical_scores.append(0.0)  # Handle failed cases
-                continue
-            
-            # Calculate scores
-            axis_scores = self.calculate_axis_scores(rubric_scores, classification)
-            medical_score = self.calculate_medical_quality_score(axis_scores)
-            
-            medical_scores.append(medical_score)
-            detailed_rows.append({
-                'question': question,
-                'gold_standard_answer': gold_answer,
-                'llm_response': llm_response,
-                'rubrics': rubrics,
-                'rubric_scores': rubric_scores,
-                'classification': classification,
-                'axis_scores': axis_scores,
-                'medical_quality_score': medical_score
-            })
         
         # Critical fix: Ensure alignment between scores and dataframe
         assert len(medical_scores) == len(self.df), f"Score length mismatch: {len(medical_scores)} vs {len(self.df)}"
