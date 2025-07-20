@@ -36,8 +36,8 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-white mb-4">Medical QA Evaluation Dashboard</h1>
-        <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+        <h1 className="text-base md:text-4xl font-bold text-white mb-4">Medical QA Evaluation Dashboard</h1>
+        <p className="text-xs md:text-xl text-gray-400 max-w-3xl mx-auto">
           Comprehensive analysis and visualization of medical question-answering evaluation results. Explore semantic
           similarity, linguistic quality, and medical accuracy metrics.
         </p>
@@ -45,31 +45,31 @@ export default function HomePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-          <div className="text-3xl mb-2">📊</div>
-          <h3 className="text-lg font-semibold text-gray-200 mb-2">Dynamic Visualizations</h3>
+          <div className="text-lg md:text-3xl mb-2">📊</div>
+          <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-2">Dynamic Visualizations</h3>
           <p className="text-gray-400 text-sm">
             Interactive charts and graphs that adapt to your data sources automatically.
           </p>
         </div>
 
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-          <div className="text-3xl mb-2">🔍</div>
-          <h3 className="text-lg font-semibold text-gray-200 mb-2">Multi-Metric Analysis</h3>
+          <div className="text-lg md:text-3xl mb-2">🔍</div>
+          <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-2">Multi-Metric Analysis</h3>
           <p className="text-gray-400 text-sm">
             Comprehensive evaluation across medical, semantic, and linguistic dimensions.
           </p>
         </div>
 
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-          <div className="text-3xl mb-2">⚡</div>
-          <h3 className="text-lg font-semibold text-gray-200 mb-2">Real-time Updates</h3>
+          <div className="text-lg md:text-3xl mb-2">⚡</div>
+          <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-2">Real-time Updates</h3>
           <p className="text-gray-400 text-sm">Live data fetching and automatic refresh when source files change.</p>
         </div>
       </div>
 
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Available Data Sources</h2>
+          <h2 className="text-base md:text-2xl font-bold text-white">Available Data Sources</h2>
           <Link href="/data-sources" className="btn-primary">
             Manage Sources
           </Link>
@@ -101,7 +101,7 @@ export default function HomePage() {
 
       {selectedSource && (
         <div className="text-center">
-          <Link href={`/dashboard?source=${selectedSource}`} className="btn-primary text-lg px-8 py-3">
+          <Link href={`/dashboard?source=${selectedSource}`} className="btn-primary text-base md:text-lg px-8 py-3">
             Analyze Selected Data Source
           </Link>
         </div>

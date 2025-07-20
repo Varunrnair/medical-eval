@@ -83,13 +83,13 @@ export default function DataTable({ data, columns, pageSize = 10 }: DataTablePro
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[600px] sm:min-w-0 text-xs sm:text-sm">
           <thead className="bg-gray-800">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column}
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-700"
+                  className="px-2 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-700"
                   onClick={() => handleSort(column)}
                 >
                   <div className="flex items-center space-x-1">
@@ -106,7 +106,7 @@ export default function DataTable({ data, columns, pageSize = 10 }: DataTablePro
             {paginatedData.map((row, index) => (
               <tr key={index} className="hover:bg-gray-800">
                 {columns.map((column) => (
-                  <td key={column} className="px-4 py-3 text-sm text-gray-300">
+                  <td key={column} className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-300">
                     {renderCellValue(row[column])}
                   </td>
                 ))}

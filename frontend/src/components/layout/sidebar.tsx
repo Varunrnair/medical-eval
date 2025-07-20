@@ -2,19 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { navigation } from "@/config/navigation"
 
 export default function Sidebar() {
   const pathname = usePathname()
 
-  const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: "📊" },
-    { name: "Medical", href: "/dashboard/medical", icon: "🏥" },
-    { name: "Semantic", href: "/dashboard/semantic", icon: "🔍" },
-    { name: "Linguistic", href: "/dashboard/linguistic", icon: "📝" },
-  ]
-
   return (
-    <div className="bg-white dark:bg-gray-950 w-52 min-h-screen border-r border-gray-200 dark:border-gray-800">
+    <div className="bg-white dark:bg-gray-950 w-52 min-h-screen border-r border-gray-200 dark:border-gray-800 hidden sm:block">
       <div className="p-5">
         <h1 className="text-base font-bold text-gray-900 dark:text-white">Medical QA</h1>
       </div>

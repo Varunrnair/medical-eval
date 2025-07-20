@@ -21,7 +21,7 @@ export default function ChartContainer({
 }: ChartContainerProps) {
   return (
     <div className={`bg-gray-900 rounded-lg border border-gray-700 p-6 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-200 mb-4">{title}</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-200 mb-4">{title}</h3>
 
       {loading && (
         <div className="flex justify-center items-center h-64">
@@ -32,7 +32,7 @@ export default function ChartContainer({
       {error && (
         <div className="flex justify-center items-center h-64">
           <div className="text-red-400 text-center">
-            <div className="text-2xl mb-2">⚠️</div>
+            <div className="text-lg md:text-2xl mb-2">⚠️</div>
             <p>{error}</p>
           </div>
         </div>

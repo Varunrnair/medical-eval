@@ -73,12 +73,12 @@ export default function ComparisonPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Cross-Dataset Comparison</h1>
+        <h1 className="text-base md:text-3xl font-bold text-white mb-2">Cross-Dataset Comparison</h1>
         <p className="text-gray-400">Compare performance metrics across different evaluation datasets.</p>
       </div>
 
       <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-200 mb-4">Select Metrics to Compare</h3>
+        <h3 className="text-xs md:text-lg font-semibold text-gray-200 mb-4">Select Metrics to Compare</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {[
             "medical_quality_score",
@@ -120,7 +120,7 @@ export default function ComparisonPage() {
           const source = dataSources.find((s) => s.id === sourceId)
           return (
             <div key={sourceId} className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-200 mb-4">{source?.name || sourceId}</h3>
+              <h3 className="text-xs md:text-lg font-semibold text-gray-200 mb-4">{source?.name || sourceId}</h3>
               <div className="space-y-2">
                 <div className="text-sm text-gray-400">Total Records: {data.length}</div>
                 {selectedMetrics.slice(0, 3).map((metric) => {

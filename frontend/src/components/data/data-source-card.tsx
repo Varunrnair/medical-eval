@@ -17,7 +17,7 @@ export default function DataSourceCard({ dataSource, onSelect, isSelected = fals
       onClick={() => onSelect(dataSource.id)}
     >
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold text-gray-200">{dataSource.name}</h3>
+        <h3 className="text-base md:text-lg font-semibold text-gray-200">{dataSource.name}</h3>
         <div className="flex space-x-2">
           {dataSource.visualizations.map((viz) => (
             <span key={viz} className="px-2 py-1 text-xs bg-green-600 text-white rounded">

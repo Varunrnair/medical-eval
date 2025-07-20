@@ -36,7 +36,7 @@ export default function DataSourcesPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Data Sources</h1>
+          <h1 className="text-base md:text-3xl font-bold text-white mb-2">Data Sources</h1>
           <p className="text-gray-400">Manage and configure your CSV data sources for analysis.</p>
         </div>
         <button className="btn-primary">Add New Source</button>
@@ -63,7 +63,7 @@ export default function DataSourcesPage() {
 
       {selectedSource && (
         <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-200 mb-4">Data Source Details</h3>
+          <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-4">Data Source Details</h3>
           {(() => {
             const source = dataSources.find((s) => s.id === selectedSource)
             if (!source) return null

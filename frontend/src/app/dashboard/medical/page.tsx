@@ -162,7 +162,7 @@ export default function MedicalAnalysisPage() {
 
 
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Medical Quality Analysis</h1>
+        <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">Medical Quality Analysis</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Analyzing medical accuracy, completeness, context awareness, communication quality, and terminology
           accessibility for individual responses.
@@ -189,31 +189,31 @@ export default function MedicalAnalysisPage() {
 
           <div className="space-y-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.question}</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.gold_standard_answer}</p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">LLM Response</h3>
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">LLM Response</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.llm_response}</p>
             </div>
           </div>
 
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Overall Medical Quality Score</h3>
-            <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Overall Medical Quality Score</h3>
+            <p className="text-lg md:text-3xl font-bold text-blue-600 dark:text-blue-400">
               {selectedData.medical_quality_score.toFixed(3)}
             </p>
           </div>
 
           {selectedData.parsedRubrics && selectedData.parsedRubricScores && (
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Evaluation Rubrics & Scores</h3>
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Evaluation Rubrics & Scores</h3>
               <div className="space-y-3">
                 {selectedData.parsedRubrics.map((rubric: string, index: number) => (
                   <div
@@ -239,7 +239,7 @@ export default function MedicalAnalysisPage() {
           {/* Axes-Scores Table */}
           {selectedData.parsedAxisScores && (
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Axes Scores Table</h3>
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Axes Scores Table</h3>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-700">
@@ -284,7 +284,7 @@ export default function MedicalAnalysisPage() {
 
               return unclassifiedRubrics.length > 0 ? (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                  <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
                     Unclassified Rubrics ({unclassifiedRubrics.length})
                   </h3>
                   <div className="space-y-2">
@@ -300,7 +300,7 @@ export default function MedicalAnalysisPage() {
                 </div>
               ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Unclassified Rubrics</h3>
+                  <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Unclassified Rubrics</h3>
                   <p className="text-green-600 dark:text-green-400">✓ All rubrics have been classified</p>
                 </div>
               )

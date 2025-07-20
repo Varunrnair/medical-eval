@@ -18,7 +18,7 @@ export default function DataPreview({ data, maxRows = 5 }: DataPreviewProps) {
   return (
     <div className="bg-gray-900 rounded-lg border border-gray-700">
       <div className="p-4 border-b border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-200">Data Preview</h3>
+        <h3 className="text-base md:text-lg font-semibold text-gray-200">Data Preview</h3>
         <p className="text-sm text-gray-400">
           Showing {previewData.length} of {data.length} rows
         </p>

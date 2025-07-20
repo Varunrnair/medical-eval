@@ -19,15 +19,15 @@ export default function MetricsCards({ metrics }: MetricsCardsProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
       {metrics.map((metric, index) => (
         <div
           key={index}
-          className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-5"
+          className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 md:p-5"
         >
-          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{metric.title}</h3>
+          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 md:mb-2">{metric.title}</h3>
           <div className="flex items-baseline">
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-base md:text-2xl font-semibold text-gray-900 dark:text-gray-100">
               {formatValue(metric.value, metric.format)}
             </p>
           </div>

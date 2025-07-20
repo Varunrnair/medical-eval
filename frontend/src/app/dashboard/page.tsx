@@ -69,7 +69,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-3">Dashboard Overview</h1>
+        <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-3">Dashboard Overview</h1>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
           This dashboard shows average scores across the entire dataset for medical QA evaluation.
         </p>
@@ -99,25 +99,25 @@ export default function DashboardPage() {
 
       <div className="space-y-6">
         <div>
-          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Medical Quality Scores</h2>
+          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Medical Quality Scores</h2>
           <MetricsCards metrics={medicalMetrics} />
         </div>
 
         <div>
-          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Semantic Similarity Scores</h2>
+          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Semantic Similarity Scores</h2>
           <MetricsCards metrics={semanticMetrics} />
         </div>
 
         <div>
-          <h2 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Linguistic Quality Scores</h2>
+          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Linguistic Quality Scores</h2>
           <MetricsCards metrics={linguisticMetrics} />
         </div>
       </div>
 
       {selectedData && (
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Selected Question Final Score</h2>
-          <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+          <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white mb-2">Selected Question Final Score</h2>
+          <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
             {(
               ((selectedData.medical_quality_score +
                 selectedData.semantic_similarity +
