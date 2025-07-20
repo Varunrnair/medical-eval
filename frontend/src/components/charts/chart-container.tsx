@@ -1,0 +1,48 @@
+"use client"
+
+import type { ReactNode } from "react"
+import LoadingSpinner from "@/components/ui/loading-spinner"
+import ErrorBoundary from "@/components/ui/error-boundary"
+
+interface ChartContainerProps {
+  title: string
+  children: ReactNode
+  loading?: boolean
+  error?: string
+  className?: string
+}
+
+export default function ChartContainer({
+  title,
+  children,
+  loading = false,
+  error,
+  className = "",
+}: ChartContainerProps) {
+  return (
+    <div className={`bg-gray-900 rounded-lg border border-gray-700 p-6 ${className}`}>
+      <h3 className="text-lg font-semibold text-gray-200 mb-4">{title}</h3>
+
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <LoadingSpinner size="lg" />
+        </div>
+      )}
+
+      {error && (
+        <div className="flex justify-center items-center h-64">
+          <div className="text-red-400 text-center">
+            <div className="text-2xl mb-2">⚠️</div>
+            <p>{error}</p>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <ErrorBoundary>
+          <div className="h-64">{children}</div>
+        </ErrorBoundary>
+      )}
+    </div>
+  )
+}

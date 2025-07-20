@@ -1,0 +1,62 @@
+{
+  "dataSources": [
+    {
+      "id": "scored-final-dataset",
+      "name": "Medical QA Evaluation Results",
+      "description": "Primary evaluation dataset with medical, semantic, and linguistic scores",
+      "filePath": "/scored_final_dataset.csv",
+      "schema": {
+        "Theme": "string",
+        "Questions": "string",
+        "Answer": "text",
+        "medical_quality_score": "number",
+        "semantic_similarity": "number",
+        "linguistic_quality_score": "number",
+        "bleu_score": "number",
+        "rouge_l_score": "number"
+      },
+      "visualizations": ["pie", "radar", "bar", "metrics"],
+      "lastUpdated": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "medical-quality-detailed",
+      "name": "Medical Quality Detailed Scores",
+      "description": "Detailed breakdown of medical quality evaluation with rubric scores",
+      "filePath": "/medical_quality_detailed_scores.csv",
+      "schema": {
+        "question": "string",
+        "medical_quality_score": "number",
+        "axis_scores": "object"
+      },
+      "visualizations": ["radar", "bar"],
+      "lastUpdated": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "linguistic-detailed",
+      "name": "Linguistic Quality Scores",
+      "description": "Average linguistic quality metrics including BLEU, METEOR, and ROUGE scores",
+      "filePath": "/linguistic_detailed_scores.csv",
+      "schema": {
+        "avg_bleu_score": "number",
+        "avg_meteor_score": "number",
+        "avg_rouge_l_score": "number",
+        "avg_linguistic_quality_score": "number"
+      },
+      "visualizations": ["bar", "metrics"],
+      "lastUpdated": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "semantic-detailed",
+      "name": "Semantic Similarity Scores",
+      "description": "Average semantic similarity metrics including cosine similarity and BERT scores",
+      "filePath": "/semantic_detailed_scores.csv",
+      "schema": {
+        "avg_cosine_similarity": "number",
+        "avg_bert_score_f1": "number",
+        "avg_semantic_similarity": "number"
+      },
+      "visualizations": ["bar", "metrics"],
+      "lastUpdated": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

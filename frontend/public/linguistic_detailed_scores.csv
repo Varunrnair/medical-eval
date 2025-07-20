@@ -1,0 +1,2 @@
+avg_bleu_score,avg_meteor_score,avg_rouge_l_score,avg_perplexity,avg_linguistic_quality_score
+0.03362500123427616,0.2778531812000695,0.21520108996161028,16.435223388671876,0.17555975746531866
