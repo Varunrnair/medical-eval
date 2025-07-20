@@ -36,7 +36,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-base md:text-4xl font-bold text-white mb-4">Medical QA Evaluation Dashboard</h1>
+        <h1 className="text-base md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Medical QA Evaluation Dashboard</h1>
         <p className="text-xs md:text-xl text-gray-400 max-w-3xl mx-auto">
           Comprehensive analysis and visualization of medical question-answering evaluation results. Explore semantic
           similarity, linguistic quality, and medical accuracy metrics.
@@ -69,7 +69,7 @@ export default function HomePage() {
 
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-base md:text-2xl font-bold text-white">Available Data Sources</h2>
+          <h2 className="text-base md:text-2xl font-bold text-gray-900 dark:text-white">Available Data Sources</h2>
           <Link href="/data-sources" className="btn-primary">
             Manage Sources
           </Link>

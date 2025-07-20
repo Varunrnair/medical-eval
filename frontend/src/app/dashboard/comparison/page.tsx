@@ -73,7 +73,7 @@ export default function ComparisonPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-base md:text-3xl font-bold text-white mb-2">Cross-Dataset Comparison</h1>
+        <h1 className="text-base md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Cross-Dataset Comparison</h1>
         <p className="text-gray-400">Compare performance metrics across different evaluation datasets.</p>
       </div>
 

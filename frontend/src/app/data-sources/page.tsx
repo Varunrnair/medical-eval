@@ -36,7 +36,7 @@ export default function DataSourcesPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-base md:text-3xl font-bold text-white mb-2">Data Sources</h1>
+          <h1 className="text-base md:text-3xl font-bold text-gray-900 dark:text-white mb-2">Data Sources</h1>
           <p className="text-gray-400">Manage and configure your CSV data sources for analysis.</p>
         </div>
         <button className="btn-primary">Add New Source</button>
