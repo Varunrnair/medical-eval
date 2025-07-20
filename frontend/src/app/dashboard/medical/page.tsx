@@ -104,7 +104,7 @@ export default function MedicalAnalysisPage() {
     if (data.length === 0) return null;
 
     try {
-      const labels = data.map((item, index) => `Q${index + 1}`).slice(0, 10);
+      const labels = data.map((item, index) => `Q${index + 1}`);
 
       // Get all possible axis keys from the first few items
       const allAxisKeys = new Set<string>();
@@ -128,7 +128,7 @@ export default function MedicalAnalysisPage() {
         const colors = ["#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"];
         return {
           label: key.charAt(0).toUpperCase() + key.slice(1),
-          data: data.slice(0, 10).map((item) => {
+          data: data.map((item) => {
             try {
               let axisScores: any = null;
               if (typeof item === "object" && 'axis_scores' in item) {
