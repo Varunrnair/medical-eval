@@ -9,11 +9,14 @@ import RadarChart from "@/components/charts/radar-chart"
 import LineChart from "@/components/charts/line-chart"
 import DonutChart from "@/components/charts/donut-chart"
 import { createBarChartData, createRadarChartData } from "@/lib/chart-utils"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
+import Modal from "@/components/ui/modal";
 
 export default function SemanticAnalysisPage() {
   const { data, loading, error } = useDataSource("scored-final-dataset")
   const [selectedIndex] = useSelectedQuestion()
+  const [barModalOpen, setBarModalOpen] = useState(false);
+  const [lineModalOpen, setLineModalOpen] = useState(false);
 
   // New bottom graphs data
   const semanticMetricsBar = useMemo(() => {
@@ -106,7 +109,9 @@ export default function SemanticAnalysisPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {chartData.barData && (
               <ChartContainer title="Semantic Similarity Metrics">
-                <BarChart data={chartData.barData} />
+                <div className="w-full h-56">
+                  <BarChart data={chartData.barData} />
+                </div>
               </ChartContainer>
             )}
 
@@ -170,7 +175,16 @@ export default function SemanticAnalysisPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {semanticMetricsBar && (
           <ChartContainer title="Semantic Metrics">
-            <BarChart data={semanticMetricsBar} />
+            <div onClick={() => setBarModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <BarChart data={semanticMetricsBar} />
+            </div>
+            <Modal open={barModalOpen} onClose={() => setBarModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <BarChart data={semanticMetricsBar} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
 
@@ -184,7 +198,16 @@ export default function SemanticAnalysisPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {trendLineData && (
           <ChartContainer title="Semantic Score Trend">
-            <LineChart data={trendLineData} />
+            <div onClick={() => setLineModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <LineChart data={trendLineData} />
+            </div>
+            <Modal open={lineModalOpen} onClose={() => setLineModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <LineChart data={trendLineData} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
 

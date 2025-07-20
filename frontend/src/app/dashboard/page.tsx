@@ -146,7 +146,11 @@ export default function DashboardPage() {
         {medicalDistribution && (
           <ChartContainer title="Medical Quality Score Distribution">
             <p className="text-xs text-gray-400 mb-2">This chart shows the proportion of answers falling into different medical quality score ranges (e.g., high, medium, low) across the dataset.</p>
-            <PieChart data={medicalDistribution} />
+            <div className="w-full flex flex-col items-center">
+              <div className="max-w-md w-full h-60 mx-auto">
+                <PieChart data={medicalDistribution} />
+              </div>
+            </div>
           </ChartContainer>
         )}
       </div>

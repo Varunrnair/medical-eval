@@ -10,10 +10,15 @@ import LineChart from "@/components/charts/line-chart"
 import StackedBarChart from "@/components/charts/stacked-bar-chart"
 import { createBarChartData, createRadarChartData } from "@/lib/chart-utils"
 import { useMemo } from "react"
+import Modal from "@/components/ui/modal";
+import { useState } from "react";
 
 export default function LinguisticAnalysisPage() {
   const { data, loading, error } = useDataSource("scored-final-dataset")
   const [selectedIndex] = useSelectedQuestion()
+  const [barModalOpen, setBarModalOpen] = useState(false);
+  const [lineModalOpen, setLineModalOpen] = useState(false);
+  const [stackedBarModalOpen, setStackedBarModalOpen] = useState(false);
 
   // New bottom graphs data
   const linguisticMetricsBar = useMemo(() => {
@@ -44,32 +49,30 @@ export default function LinguisticAnalysisPage() {
   const stackedCompositionData = useMemo(() => {
     if (data.length === 0) return null
 
-    const labels = data.map((item, index) => `Q${index + 1}`).slice(0, 10)
-
+    const labels = data.map((item, index) => `Q${index + 1}`)
     const datasets = [
       {
         label: "BLEU",
-        data: data.slice(0, 10).map((item) => item.bleu_score),
+        data: data.map((item) => item.bleu_score),
         backgroundColor: "#10B981",
         borderColor: "#059669",
         borderWidth: 1,
       },
       {
         label: "METEOR",
-        data: data.slice(0, 10).map((item) => item.meteor_score),
+        data: data.map((item) => item.meteor_score),
         backgroundColor: "#F59E0B",
         borderColor: "#D97706",
         borderWidth: 1,
       },
       {
         label: "ROUGE-L",
-        data: data.slice(0, 10).map((item) => item.rouge_l_score),
+        data: data.map((item) => item.rouge_l_score),
         backgroundColor: "#8B5CF6",
         borderColor: "#7C3AED",
         borderWidth: 1,
       },
     ]
-
     return { labels, datasets }
   }, [data])
 
@@ -174,13 +177,31 @@ export default function LinguisticAnalysisPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {linguisticMetricsBar && (
           <ChartContainer title="BLEU, METEOR, ROUGE-L Scores">
-            <BarChart data={linguisticMetricsBar} />
+            <div onClick={() => setBarModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <BarChart data={linguisticMetricsBar} />
+            </div>
+            <Modal open={barModalOpen} onClose={() => setBarModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <BarChart data={linguisticMetricsBar} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
 
         {perplexityLineData && (
           <ChartContainer title="Perplexity Score Across Questions">
-            <LineChart data={perplexityLineData} />
+            <div onClick={() => setLineModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <LineChart data={perplexityLineData} />
+            </div>
+            <Modal open={lineModalOpen} onClose={() => setLineModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <LineChart data={perplexityLineData} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
       </div>
@@ -188,7 +209,16 @@ export default function LinguisticAnalysisPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {stackedCompositionData && (
           <ChartContainer title="Linguistic Metric Composition">
-            <StackedBarChart data={stackedCompositionData} />
+            <div onClick={() => setStackedBarModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <StackedBarChart data={stackedCompositionData} />
+            </div>
+            <Modal open={stackedBarModalOpen} onClose={() => setStackedBarModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <StackedBarChart data={stackedCompositionData} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
       </div>

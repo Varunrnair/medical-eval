@@ -12,10 +12,14 @@ import LineChart from "@/components/charts/line-chart"
 import StackedBarChart from "@/components/charts/stacked-bar-chart"
 import { useState } from "react"
 import type { MedicalQualityDetailed } from "@/types/data";
+import Modal from "@/components/ui/modal";
 
 export default function MedicalAnalysisPage() {
   const { data, loading, error } = useDataSource("medical-quality-detailed") as { data: MedicalQualityDetailed[], loading: boolean, error: string | null }
   const [selectedIndex] = useSelectedQuestion()
+  const [barModalOpen, setBarModalOpen] = useState(false);
+  const [stackedBarModalOpen, setStackedBarModalOpen] = useState(false);
+  const [trendLineModalOpen, setTrendLineModalOpen] = useState(false);
 
 
   const selectedData = useMemo(() => {
@@ -205,7 +209,9 @@ export default function MedicalAnalysisPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {chartData.barData && (
                   <ChartContainer title="Average Medical Quality Dimensions">
-                    <BarChart data={chartData.barData} />
+                    <div className="w-full h-56">
+                      <BarChart data={chartData.barData} />
+                    </div>
                   </ChartContainer>
                 )}
 
@@ -370,7 +376,16 @@ export default function MedicalAnalysisPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {horizontalBarData && (
           <ChartContainer title="Medical Quality Score by Question">
-            <BarChart data={horizontalBarData} />
+            <div onClick={() => setBarModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <BarChart data={horizontalBarData} />
+            </div>
+            <Modal open={barModalOpen} onClose={() => setBarModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <BarChart data={horizontalBarData} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
 
@@ -384,13 +399,31 @@ export default function MedicalAnalysisPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {stackedBarData && (
           <ChartContainer title="Axis Contribution to Medical Quality">
-            <StackedBarChart data={stackedBarData} />
+            <div onClick={() => setStackedBarModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <StackedBarChart data={stackedBarData} />
+            </div>
+            <Modal open={stackedBarModalOpen} onClose={() => setStackedBarModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <StackedBarChart data={stackedBarData} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
 
         {trendLineData && (
           <ChartContainer title="Medical Quality Score Progression">
-            <LineChart data={trendLineData} />
+            <div onClick={() => setTrendLineModalOpen(true)} className="w-full h-56 cursor-pointer">
+              <LineChart data={trendLineData} />
+            </div>
+            <Modal open={trendLineModalOpen} onClose={() => setTrendLineModalOpen(false)}>
+              <div className="w-[1200px] max-w-full">
+                <div className="w-full h-[400px]">
+                  <LineChart data={trendLineData} />
+                </div>
+              </div>
+            </Modal>
           </ChartContainer>
         )}
       </div>
