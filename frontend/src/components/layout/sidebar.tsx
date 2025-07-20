@@ -10,7 +10,9 @@ export default function Sidebar() {
   return (
     <div className="bg-white dark:bg-gray-950 w-52 min-h-screen border-r border-gray-200 dark:border-gray-800 hidden sm:block">
       <div className="p-5">
-        <h1 className="text-base font-bold text-gray-900 dark:text-white">Medical QA</h1>
+        <Link href="/" className="block text-base font-bold text-gray-900 dark:text-white hover:underline focus:outline-none">
+          Medical QA
+        </Link>
       </div>
 
       <nav className="px-4">

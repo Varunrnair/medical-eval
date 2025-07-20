@@ -28,7 +28,6 @@ export default function SemanticAnalysisPage() {
       "vyakyarth_similarity",
       "bert_score_f1",
       "semantic_similarity",
-      "vyakyarth_semantic_score",
     ])
   }, [data])
 
@@ -176,13 +175,13 @@ export default function SemanticAnalysisPage() {
       {/* New bottom graphs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {semanticMetricsBar && (
-          <ChartContainer title="Semantic Metrics by Question">
+          <ChartContainer title="Semantic Metrics">
             <BarChart data={semanticMetricsBar} />
           </ChartContainer>
         )}
 
         {fiveSemanticRadar && (
-          <ChartContainer title="Five Semantic Metrics Radar">
+          <ChartContainer title="Individual Semantic Metrics Radar">
             <RadarChart data={fiveSemanticRadar} />
           </ChartContainer>
         )}
