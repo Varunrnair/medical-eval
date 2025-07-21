@@ -66,8 +66,8 @@ export default function SemanticAnalysisPage() {
       datasets: [
         {
           data: [avgCosine, avgBert, avgVyakyarth],
-          backgroundColor: ["#10B981", "#F59E0B", "#8B5CF6"],
-          borderColor: ["#059669", "#D97706", "#7C3AED"],
+          backgroundColor: ["#3B82F6", "#14B8A6", "#6B7280"],
+          borderColor: ["#9CA3AF", "#D1D5DB", "#6B7280"],
           borderWidth: 2,
         },
       ],
@@ -94,7 +94,7 @@ export default function SemanticAnalysisPage() {
   return (
     <div className="space-y-6">
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
         <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">Semantic Analysis</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Measuring semantic similarity between LLM responses and gold standard answers using cosine similarity, BERT
@@ -110,7 +110,7 @@ export default function SemanticAnalysisPage() {
             {chartData.barData && (
               <ChartContainer title="Semantic Similarity Metrics">
                 <div className="w-full h-56">
-                  <BarChart data={chartData.barData} />
+                <BarChart data={chartData.barData} />
                 </div>
               </ChartContainer>
             )}
@@ -123,47 +123,47 @@ export default function SemanticAnalysisPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Questions}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Answer}</p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">LLM Response</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.llm_response}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Cosine Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
                 {selectedData.cosine_similarity.toFixed(3)}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">BERT Score F1</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
                 {selectedData.bert_score_f1.toFixed(3)}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Semantic Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
                 {selectedData.semantic_similarity.toFixed(3)}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Vyakyarth Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
                 {selectedData.vyakyarth_similarity.toFixed(3)}
               </p>
             </div>
@@ -181,7 +181,7 @@ export default function SemanticAnalysisPage() {
             <Modal open={barModalOpen} onClose={() => setBarModalOpen(false)}>
               <div className="w-[1200px] max-w-full">
                 <div className="w-full h-[400px]">
-                  <BarChart data={semanticMetricsBar} />
+            <BarChart data={semanticMetricsBar} />
                 </div>
               </div>
             </Modal>
@@ -204,7 +204,7 @@ export default function SemanticAnalysisPage() {
             <Modal open={lineModalOpen} onClose={() => setLineModalOpen(false)}>
               <div className="w-[1200px] max-w-full">
                 <div className="w-full h-[400px]">
-                  <LineChart data={trendLineData} />
+            <LineChart data={trendLineData} />
                 </div>
               </div>
             </Modal>

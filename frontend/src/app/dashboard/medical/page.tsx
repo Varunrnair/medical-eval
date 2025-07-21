@@ -125,7 +125,13 @@ export default function MedicalAnalysisPage() {
       if (axisKeysArray.length === 0) return null;
 
       const datasets = axisKeysArray.map((key: string, index: number) => {
-        const colors = ["#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"];
+        const colors = [
+          "#3B82F6", // muted blue
+          "#6B7280", // grey
+          "#14B8A6", // accent teal
+          "#9CA3AF", // light grey
+          "#D1D5DB", // extra light grey
+        ];
         return {
           label: key.charAt(0).toUpperCase() + key.slice(1),
           data: data.map((item) => {
@@ -179,7 +185,7 @@ export default function MedicalAnalysisPage() {
       {/* New top graphs */}
 
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
         <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">Medical Quality Analysis</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Analyzing medical accuracy, completeness, context awareness, communication quality, and terminology
@@ -201,7 +207,7 @@ export default function MedicalAnalysisPage() {
             selectedData.parsedRubricScores &&
             selectedData.parsedAxisScores
           ) ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center">
+            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6 text-center">
               <p className="text-red-600 dark:text-red-400 font-semibold">No data available for this question. (Missing or invalid rubric/axis data)</p>
             </div>
           ) : (
@@ -210,7 +216,7 @@ export default function MedicalAnalysisPage() {
                 {chartData.barData && (
                   <ChartContainer title="Average Medical Quality Dimensions">
                     <div className="w-full h-56">
-                      <BarChart data={chartData.barData} />
+                    <BarChart data={chartData.barData} />
                     </div>
                   </ChartContainer>
                 )}
@@ -223,23 +229,23 @@ export default function MedicalAnalysisPage() {
               </div>
 
               <div className="space-y-4">
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.question}</p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.gold_standard_answer}</p>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">LLM Response</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.llm_response}</p>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
                 <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Overall Medical Quality Score</h3>
                 <p className="text-lg md:text-3xl font-bold text-green-600 dark:text-green-400">
                   {selectedData.medical_quality_score.toFixed(3)}
@@ -249,7 +255,7 @@ export default function MedicalAnalysisPage() {
               {/* Collapsible Rubrics Section (Simple, clean style) */}
               {typeof selectedData === "object" && "parsedRubrics" in selectedData && "parsedRubricScores" in selectedData && selectedData.parsedRubrics && selectedData.parsedRubricScores && (
                 <SimpleDropdown label="Check out the individual rubrics">
-                  <ul className="space-y-2 bg-gray-800 dark:bg-gray-900 rounded-lg p-4 border border-gray-700">
+                  <ul className="space-y-2 bg-neutral-800 dark:bg-neutral-900 rounded-lg p-4 border border-neutral-700">
                     {selectedData.parsedRubrics.map((rubric: string, index: number) => {
                       const isPass = selectedData.parsedRubricScores[rubric] === 1;
                       return (
@@ -263,8 +269,8 @@ export default function MedicalAnalysisPage() {
                             }`}
                           >
                             {isPass ? 'Pass' : 'Fail'}
-                          </span>
-                        </li>
+                        </span>
+                      </li>
                       );
                     })}
                   </ul>
@@ -299,14 +305,14 @@ export default function MedicalAnalysisPage() {
                 });
                 return (
                   <div className="mb-4">
-                    <SimpleDropdown label="See rubric-to-axis mapping">
-                      <ul className="space-y-4 bg-gray-800 dark:bg-gray-900 rounded-lg p-4 border border-gray-700">
+                <SimpleDropdown label="See rubric-to-axis mapping">
+                      <ul className="space-y-4 bg-neutral-800 dark:bg-neutral-900 rounded-lg p-4 border border-neutral-700">
                         {mapping && Object.keys(mapping).length > 0 ? (
                           Object.entries(mapping).map(([axis, rubrics]: [string, any], i: number) => (
-                            <li key={axis}>
+                      <li key={axis}>
                               <div className="font-semibold text-gray-100 mb-1">{axis}</div>
                               <ul className="ml-4 space-y-1">
-                                {(Array.isArray(rubrics) ? rubrics : []).map((rubric: string, idx: number) => (
+                          {(Array.isArray(rubrics) ? rubrics : []).map((rubric: string, idx: number) => (
                                   <li key={idx} className="text-gray-300 text-sm">{rubric}</li>
                                 ))}
                               </ul>
@@ -332,18 +338,18 @@ export default function MedicalAnalysisPage() {
                       <div className="mt-4 text-green-600 dark:text-green-400 text-sm">
                         ✓ All rubrics have been classified
                       </div>
-                    )}
+              )}
                   </div>
                 );
               })()}
 
               {/* Axes-Scores Table */}
               {typeof selectedData === "object" && "parsedAxisScores" in selectedData && selectedData.parsedAxisScores && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Axes Scores Table</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-gray-50 dark:bg-gray-700">
+                      <thead className="bg-neutral-50 dark:bg-neutral-700">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Axis
@@ -382,7 +388,7 @@ export default function MedicalAnalysisPage() {
             <Modal open={barModalOpen} onClose={() => setBarModalOpen(false)}>
               <div className="w-[1200px] max-w-full">
                 <div className="w-full h-[400px]">
-                  <BarChart data={horizontalBarData} />
+            <BarChart data={horizontalBarData} />
                 </div>
               </div>
             </Modal>
@@ -405,7 +411,7 @@ export default function MedicalAnalysisPage() {
             <Modal open={stackedBarModalOpen} onClose={() => setStackedBarModalOpen(false)}>
               <div className="w-[1200px] max-w-full">
                 <div className="w-full h-[400px]">
-                  <StackedBarChart data={stackedBarData} />
+            <StackedBarChart data={stackedBarData} />
                 </div>
               </div>
             </Modal>
@@ -420,7 +426,7 @@ export default function MedicalAnalysisPage() {
             <Modal open={trendLineModalOpen} onClose={() => setTrendLineModalOpen(false)}>
               <div className="w-[1200px] max-w-full">
                 <div className="w-full h-[400px]">
-                  <LineChart data={trendLineData} />
+            <LineChart data={trendLineData} />
                 </div>
               </div>
             </Modal>
@@ -434,7 +440,7 @@ export default function MedicalAnalysisPage() {
 function SimpleDropdown({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-2">
+    <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 mb-2">
       <button
         className="w-full flex items-center justify-between px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         onClick={() => setOpen((v) => !v)}

@@ -34,7 +34,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-neutral-200 dark:bg-neutral-900 min-h-screen">
       <div className="text-center">
         <h1 className="text-base md:text-4xl font-bold text-gray-900 dark:text-white mb-4">Medical QA Evaluation Dashboard</h1>
         <p className="text-xs md:text-xl text-gray-400 max-w-3xl mx-auto">
@@ -44,7 +44,7 @@ export default function HomePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
+        <div className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
           <div className="text-lg md:text-3xl mb-2">📊</div>
           <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-2">Dynamic Visualizations</h3>
           <p className="text-gray-400 text-sm">
@@ -52,7 +52,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
+        <div className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
           <div className="text-lg md:text-3xl mb-2">🔍</div>
           <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-2">Multi-Metric Analysis</h3>
           <p className="text-gray-400 text-sm">
@@ -60,7 +60,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="bg-gray-900 rounded-lg border border-gray-700 p-6">
+        <div className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-800 p-6">
           <div className="text-lg md:text-3xl mb-2">⚡</div>
           <h3 className="text-sm md:text-lg font-semibold text-gray-200 mb-2">Real-time Updates</h3>
           <p className="text-gray-400 text-sm">Live data fetching and automatic refresh when source files change.</p>
@@ -69,7 +69,7 @@ export default function HomePage() {
 
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-base md:text-2xl font-bold text-gray-900 dark:text-white">Available Data Sources</h2>
+          <h2 className="text-base md:text-2xl font-bold text-neutral-900 dark:text-neutral-100">Available Data Sources</h2>
           <Link href="/data-sources" className="btn-primary">
             Manage Sources
           </Link>

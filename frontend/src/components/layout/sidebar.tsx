@@ -23,8 +23,8 @@ export default function Sidebar() {
               href={item.href}
               className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                 pathname === item.href
-                  ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  ? "bg-neutral-800 text-neutral-100"
+                  : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
               }`}
             >
               <span className="mr-3">{item.icon}</span>

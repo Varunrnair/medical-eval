@@ -18,11 +18,11 @@ export function createPieChartData(data: any[], field: string): ChartData {
         label: field,
         data: Object.values(counts),
         backgroundColor: [
-          "#10B981", // green
-          "#F59E0B", // yellow
-          "#EF4444", // red
-          "#8B5CF6", // purple
-          "#06B6D4", // cyan
+          "#3B82F6", // muted blue
+          "#6B7280", // grey
+          "#14B8A6", // accent teal
+          "#9CA3AF", // light grey
+          "#D1D5DB", // extra light grey
         ],
         borderColor: "#1F2937",
         borderWidth: 2,
@@ -43,8 +43,8 @@ export function createBarChartData(data: any[], fields: string[]): ChartData {
       {
         label: "Average Scores",
         data: averages,
-        backgroundColor: "#10B981",
-        borderColor: "#059669",
+        backgroundColor: "#3B82F6",
+        borderColor: "#6B7280",
         borderWidth: 1,
       },
     ],
@@ -63,9 +63,9 @@ export function createRadarChartData(data: any[], fields: string[]): RadarChartD
       {
         label: "Performance Metrics",
         data: averages,
-        backgroundColor: "rgba(16, 185, 129, 0.2)",
-        borderColor: "#10B981",
-        pointBackgroundColor: "#10B981",
+        backgroundColor: "rgba(59, 130, 246, 0.15)", // muted blue fill
+        borderColor: "#3B82F6",
+        pointBackgroundColor: "#14B8A6", // accent teal
       },
     ],
   }

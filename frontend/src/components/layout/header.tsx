@@ -75,7 +75,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3 relative">
+    <header className="bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 px-4 py-3 relative">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           {/* Hamburger for mobile */}
@@ -129,9 +129,9 @@ export default function Header() {
       {/* Info Modal */}
       {infoOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg w-full max-w-xs md:max-w-md p-4 md:p-6 relative overflow-y-auto max-h-[90vh]">
+          <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-lg w-full max-w-xs md:max-w-md p-4 md:p-6 relative overflow-y-auto max-h-[90vh]">
             <button
-              className="absolute top-1.5 right-1.5 p-3 md:top-2 md:right-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="absolute top-1.5 right-1.5 p-3 md:top-2 md:right-2 rounded-full hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500"
               aria-label="Close metric info"
               onClick={() => setInfoOpen(false)}
             >
