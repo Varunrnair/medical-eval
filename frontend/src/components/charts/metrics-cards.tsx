@@ -23,11 +23,11 @@ export default function MetricsCards({ metrics }: MetricsCardsProps) {
       {metrics.map((metric, index) => (
         <div
           key={index}
-          className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-3 md:p-5"
+          className="bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-3 md:p-5"
         >
-          <h3 className="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 md:mb-2">{metric.title}</h3>
+          <h3 className="text-xs md:text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-1 md:mb-2">{metric.title}</h3>
           <div className="flex items-baseline">
-            <p className="text-base md:text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-base md:text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
               {formatValue(metric.value, metric.format)}
             </p>
           </div>
