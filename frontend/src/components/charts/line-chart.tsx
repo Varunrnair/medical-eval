@@ -12,6 +12,7 @@ import {
   Legend,
 } from "chart.js"
 import type { ChartData } from "@/types/charts"
+import { useEffect, useState } from "react"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend)
 
@@ -20,38 +21,51 @@ interface LineChartProps {
 }
 
 export default function LineChart({ data }: LineChartProps) {
+  // Detect dark mode
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    }
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
         labels: {
-          color: "#E5E7EB",
+          color: isDark ? "#E5E7EB" : "#374151",
         },
       },
       tooltip: {
-        backgroundColor: "#1F2937",
-        titleColor: "#E5E7EB",
-        bodyColor: "#E5E7EB",
-        borderColor: "#374151",
+        backgroundColor: isDark ? "#1F2937" : "#fff",
+        titleColor: isDark ? "#E5E7EB" : "#374151",
+        bodyColor: isDark ? "#E5E7EB" : "#374151",
+        borderColor: isDark ? "#374151" : "#E5E7EB",
         borderWidth: 1,
       },
     },
     scales: {
       x: {
         ticks: {
-          color: "#9CA3AF",
+          color: isDark ? "#9CA3AF" : "#374151",
         },
         grid: {
-          color: "#374151",
+          color: isDark ? "#374151" : "#E5E7EB",
         },
       },
       y: {
         ticks: {
-          color: "#9CA3AF",
+          color: isDark ? "#9CA3AF" : "#374151",
         },
         grid: {
-          color: "#374151",
+          color: isDark ? "#374151" : "#E5E7EB",
         },
       },
     },

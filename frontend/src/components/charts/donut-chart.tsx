@@ -2,6 +2,7 @@
 
 import { Doughnut } from "react-chartjs-2"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
+import { useEffect, useState } from "react"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -18,6 +19,19 @@ interface DonutChartProps {
 }
 
 export default function DonutChart({ data }: DonutChartProps) {
+  // Detect dark mode
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    }
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -25,15 +39,15 @@ export default function DonutChart({ data }: DonutChartProps) {
       legend: {
         position: "bottom" as const,
         labels: {
-          color: "#E5E7EB",
+          color: isDark ? "#E5E7EB" : "#374151",
           padding: 20,
         },
       },
       tooltip: {
-        backgroundColor: "#1F2937",
-        titleColor: "#E5E7EB",
-        bodyColor: "#E5E7EB",
-        borderColor: "#374151",
+        backgroundColor: isDark ? "#1F2937" : "#fff",
+        titleColor: isDark ? "#E5E7EB" : "#374151",
+        bodyColor: isDark ? "#E5E7EB" : "#374151",
+        borderColor: isDark ? "#374151" : "#E5E7EB",
         borderWidth: 1,
       },
     },

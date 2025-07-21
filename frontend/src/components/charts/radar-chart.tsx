@@ -3,6 +3,7 @@
 import { Radar } from "react-chartjs-2"
 import { Chart as ChartJS, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from "chart.js"
 import type { RadarChartData } from "@/types/charts"
+import { useEffect, useState } from "react"
 
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend)
 
@@ -11,6 +12,19 @@ interface RadarChartProps {
 }
 
 export default function RadarChart({ data }: RadarChartProps) {
+  // Detect dark mode
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    }
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -19,29 +33,29 @@ export default function RadarChart({ data }: RadarChartProps) {
         display: false,
       },
       tooltip: {
-        backgroundColor: "#1F2937",
-        titleColor: "#E5E7EB",
-        bodyColor: "#E5E7EB",
-        borderColor: "#374151",
+        backgroundColor: isDark ? "#1F2937" : "#fff",
+        titleColor: isDark ? "#E5E7EB" : "#374151",
+        bodyColor: isDark ? "#E5E7EB" : "#374151",
+        borderColor: isDark ? "#374151" : "#E5E7EB",
         borderWidth: 1,
       },
     },
     scales: {
       r: {
         angleLines: {
-          color: "#374151",
+          color: isDark ? "#374151" : "#E5E7EB",
         },
         grid: {
-          color: "#374151",
+          color: isDark ? "#374151" : "#E5E7EB",
         },
         pointLabels: {
-          color: "#9CA3AF",
+          color: isDark ? "#9CA3AF" : "#374151",
           font: {
             size: 12,
           },
         },
         ticks: {
-          color: "#9CA3AF",
+          color: isDark ? "#9CA3AF" : "#374151",
           backdropColor: "transparent",
         },
         min: 0,
