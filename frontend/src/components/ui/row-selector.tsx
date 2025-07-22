@@ -16,7 +16,7 @@ export default function RowSelector({ data, questionField = "Questions" }: RowSe
       <select
         value={selectedIndex ?? ""}
         onChange={(e) => setSelectedIndex(e.target.value ? Number(e.target.value) : null)}
-        className="w-full px-3 py-2 text-sm bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-md text-gray-900 dark:text-gray-100"
+        className="w-full px-3 py-2 text-sm bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-xl text-gray-900 dark:text-gray-100"
       >
         <option value="">Choose a question...</option>
         {data.map((item, index) => (

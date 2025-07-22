@@ -98,7 +98,7 @@ export default function LinguisticAnalysisPage() {
   return (
     <div className="space-y-6">
 
-      <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+      <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
         <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">Linguistic Analysis</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Evaluating linguistic quality through BLEU, METEOR, ROUGE-L scores, and overall linguistic quality metrics to
@@ -125,45 +125,45 @@ export default function LinguisticAnalysisPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Question</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Questions}</p>
             </div>
 
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Gold Standard Answer</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Answer}</p>
             </div>
 
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">LLM Response</h3>
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.llm_response}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">BLEU Score</h3>
               <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.bleu_score.toFixed(3)}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">METEOR Score</h3>
               <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.meteor_score.toFixed(3)}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">ROUGE-L Score</h3>
               <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.rouge_l_score.toFixed(3)}
               </p>
             </div>
 
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Linguistic Quality</h3>
               <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.linguistic_quality_score.toFixed(3)}

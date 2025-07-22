@@ -76,7 +76,7 @@ export default function DataSourcesPage() {
                     type="text"
                     value={source.name}
                     readOnly
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-xl text-gray-200"
                   />
                 </div>
 
@@ -86,7 +86,7 @@ export default function DataSourcesPage() {
                     value={source.description}
                     readOnly
                     rows={3}
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-xl text-gray-200"
                   />
                 </div>
 
@@ -96,13 +96,13 @@ export default function DataSourcesPage() {
                     type="text"
                     value={source.filePath}
                     readOnly
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 text-sm"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-xl text-gray-200 text-sm"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Schema</label>
-                  <div className="bg-gray-800 rounded-md p-3">
+                  <div className="bg-gray-800 rounded-xl p-3">
                     <pre className="text-sm text-gray-300">{JSON.stringify(source.schema, null, 2)}</pre>
                   </div>
                 </div>

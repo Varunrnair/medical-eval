@@ -11,7 +11,7 @@ interface DataSourceCardProps {
 export default function DataSourceCard({ dataSource, onSelect, isSelected = false }: DataSourceCardProps) {
   return (
     <div
-      className={`bg-neutral-800 rounded-lg border p-6 cursor-pointer transition-all ${
+      className={`bg-neutral-800 rounded-xl border p-6 cursor-pointer transition-all ${
         isSelected ? "border-neutral-500" : "border-neutral-700"
       }`}
       onClick={() => onSelect(dataSource.id)}
@@ -20,7 +20,7 @@ export default function DataSourceCard({ dataSource, onSelect, isSelected = fals
         <h3 className="text-base md:text-lg font-semibold text-gray-200">{dataSource.name}</h3>
         <div className="flex space-x-2">
           {dataSource.visualizations.map((viz) => (
-            <span key={viz} className="px-2 py-1 text-xs bg-neutral-700 text-neutral-100 rounded">
+            <span key={viz} className="px-2 py-1 text-xs bg-neutral-700 text-neutral-100 rounded-xl">
               {viz}
             </span>
           ))}

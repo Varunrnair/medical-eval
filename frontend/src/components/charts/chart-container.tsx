@@ -20,7 +20,7 @@ export default function ChartContainer({
   className = "",
 }: ChartContainerProps) {
   return (
-    <div className={`bg-neutral-100 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-6 ${className}`}>
+    <div className={`bg-neutral-100 dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 ${className}`}>
       <h3 className="text-base md:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">{title}</h3>
 
       {loading && (

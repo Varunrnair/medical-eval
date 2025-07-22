@@ -11,7 +11,7 @@ export default function Sidebar() {
   return (
     <div className="bg-neutral-100 dark:bg-neutral-900 w-52 min-h-screen border-r border-neutral-200 dark:border-neutral-800 hidden sm:block relative">
       <div className="px-5 py-6"> {/* Increased vertical padding here */}
-        <div className="group flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 transition-all duration-200 hover:text-green-600 dark:hover:text-green-400 hover:scale-105 cursor-pointer">
+        <div className="group flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 transition-all duration-200 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105 cursor-pointer">
           <Image
             src="/icons/simppl_icon.png"
             alt=""

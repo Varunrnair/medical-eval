@@ -185,7 +185,7 @@ export default function MedicalAnalysisPage() {
       {/* New top graphs */}
 
 
-      <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+      <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
         <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">Medical Quality Analysis</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Analyzing medical accuracy, completeness, context awareness, communication quality, and terminology
@@ -207,7 +207,7 @@ export default function MedicalAnalysisPage() {
             selectedData.parsedRubricScores &&
             selectedData.parsedAxisScores
           ) ? (
-            <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6 text-center">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6 text-center">
               <p className="text-red-600 dark:text-red-400 font-semibold">No data available for this question. (Missing or invalid rubric/axis data)</p>
             </div>
           ) : (
@@ -229,23 +229,23 @@ export default function MedicalAnalysisPage() {
               </div>
 
               <div className="space-y-4">
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.question}</p>
                 </div>
 
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.gold_standard_answer}</p>
                 </div>
 
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">LLM Response</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.llm_response}</p>
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+              <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                 <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Overall Medical Quality Score</h3>
                 <p className="text-lg md:text-3xl font-bold text-green-600 dark:text-green-400">
                   {selectedData.medical_quality_score.toFixed(3)}
@@ -255,14 +255,14 @@ export default function MedicalAnalysisPage() {
               {/* Collapsible Rubrics Section (Simple, clean style) */}
               {typeof selectedData === "object" && "parsedRubrics" in selectedData && "parsedRubricScores" in selectedData && selectedData.parsedRubrics && selectedData.parsedRubricScores && (
                 <SimpleDropdown label="Check out the individual rubrics">
-                  <ul className="space-y-2 bg-neutral-800 dark:bg-neutral-900 rounded-lg p-4 border border-neutral-700">
+                  <ul className="space-y-2 bg-neutral-800 dark:bg-neutral-900 rounded-xl p-4 border border-neutral-700">
                     {selectedData.parsedRubrics.map((rubric: string, index: number) => {
                       const isPass = selectedData.parsedRubricScores[rubric] === 1;
                       return (
                         <li key={index} className="flex items-center justify-between">
                           <span className="text-gray-100 text-sm">{rubric}</span>
                           <span
-                            className={`ml-4 px-2 py-0.5 rounded text-xs font-semibold ${
+                            className={`ml-4 px-2 py-0.5 rounded-xl text-xs font-semibold ${
                               isPass
                                 ? 'bg-green-600 text-white'
                                 : 'bg-red-600 text-white'
@@ -306,7 +306,7 @@ export default function MedicalAnalysisPage() {
                 return (
                   <div className="mb-4">
                 <SimpleDropdown label="See rubric-to-axis mapping">
-                      <ul className="space-y-4 bg-neutral-800 dark:bg-neutral-900 rounded-lg p-4 border border-neutral-700">
+                      <ul className="space-y-4 bg-neutral-800 dark:bg-neutral-900 rounded-xl p-4 border border-neutral-700">
                         {mapping && Object.keys(mapping).length > 0 ? (
                           Object.entries(mapping).map(([axis, rubrics]: [string, any], i: number) => (
                       <li key={axis}>
@@ -345,7 +345,7 @@ export default function MedicalAnalysisPage() {
 
               {/* Axes-Scores Table */}
               {typeof selectedData === "object" && "parsedAxisScores" in selectedData && selectedData.parsedAxisScores && (
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 p-6">
+                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Axes Scores Table</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full">
@@ -440,7 +440,7 @@ export default function MedicalAnalysisPage() {
 function SimpleDropdown({ label, children }: { label: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 mb-2">
+    <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 mb-2">
       <button
         className="w-full flex items-center justify-between px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
         onClick={() => setOpen((v) => !v)}
