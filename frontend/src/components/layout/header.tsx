@@ -68,7 +68,7 @@ export default function Header() {
 
   const getPageTitle = (path: string) => {
     const segments = path.split("/").filter(Boolean)
-    if (segments.length === 0) return "Overview"
+    if (segments.length === 0) return "Home"
 
     const lastSegment = segments[segments.length - 1]
     return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).replace("-", " ")

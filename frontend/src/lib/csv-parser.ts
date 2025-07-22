@@ -2,40 +2,6 @@ import Papa from "papaparse"
 import fs from "fs"
 import path from "path"
 
-// This function is no longer used for local files, but kept for completeness if needed for external URLs
-export async function parseCsvFromUrl(url: string): Promise<any[]> {
-  try {
-    const response = await fetch(url)
-    const csvText = await response.text()
-
-    return new Promise((resolve, reject) => {
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        transform: (value, field) => {
-          if (field && (field.includes("score") || field.includes("similarity") || field.includes("perplexity"))) {
-            const num = Number.parseFloat(value)
-            return isNaN(num) ? value : num
-          }
-          return value
-        },
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            reject(new Error(`CSV parsing errors: ${results.errors.map((e) => e.message).join(", ")}`))
-          } else {
-            resolve(results.data)
-          }
-        },
-        error: (error) => {
-          reject(error)
-        },
-      })
-    })
-  } catch (error) {
-    throw new Error(`Failed to fetch or parse CSV: ${error}`)
-  }
-}
-
 export async function parseCsvFromPath(filePath: string): Promise<any[]> {
   try {
     // Construct the full path relative to the public directory
@@ -54,7 +20,7 @@ export async function parseCsvFromPath(filePath: string): Promise<any[]> {
         header: true,
         skipEmptyLines: true,
         transform: (value, field) => {
-          if (field && (field.includes("score") || field.includes("similarity") || field.includes("perplexity"))) {
+          if (typeof field === "string" && (field.includes("score") || field.includes("similarity") || field.includes("perplexity"))) {
             const num = Number.parseFloat(value)
             return isNaN(num) ? value : num
           }
@@ -67,7 +33,7 @@ export async function parseCsvFromPath(filePath: string): Promise<any[]> {
             resolve(results.data)
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           reject(error)
         },
       })
