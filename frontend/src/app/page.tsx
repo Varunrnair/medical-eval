@@ -69,6 +69,7 @@ export default function HomePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <br/>
                 <ul className="text-sm text-neutral-300 space-y-2">
                   <li>• Medical Accuracy Assessment</li>
                   <li>• Completeness Evaluation</li>
@@ -88,6 +89,7 @@ export default function HomePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <br/>
                 <ul className="text-sm text-neutral-300 space-y-2">
                   <li>• Cosine Similarity Analysis</li>
                   <li>• BERT Score F1 Evaluation</li>
@@ -107,6 +109,7 @@ export default function HomePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <br/>
                 <ul className="text-sm text-neutral-300 space-y-2">
                   <li>• BLEU Score Assessment</li>
                   <li>• METEOR Score Analysis</li>
