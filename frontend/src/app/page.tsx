@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-neutral-950">
       {/* Navigation */}
-      <nav className="border-b border-neutral-800 bg-neutral-900/90 backdrop-blur-md sticky top-0 z-50">
+      <nav className="border-b border-neutral-800 bg-neutral-900/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
@@ -17,36 +17,37 @@ export default function HomePage() {
               <span className="text-xl font-bold text-white">Medical QA Evaluator</span>
             </div>
             <Link href="/dashboard">
-                <Button className="bg-neutral-700 hover:bg-neutral-700 px-6 whitespace-nowrap">
+                <Button className="flex items-center gap-2 bg-neutral-700 hover:bg-neutral-700 px-6 whitespace-nowrap">
                     Go to Dashboard
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" />
                 </Button>
-          </Link>
+            </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             Advanced LLM Evaluation for
             <span className="bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent block">
-              Medical Question Answering
+                Medical Question Answering
             </span>
-          </h1>
-          <p className="text-lg text-neutral-300 mb-8 leading-relaxed">
+            </h1>
+            <p className="text-lg text-neutral-300 mb-8 leading-relaxed">
             Comprehensive analysis and comparison of Large Language Model responses against gold standard medical
             answers using multi-dimensional evaluation metrics.
-          </p>
-          <Link href="/dashboard">
-            <Button size="lg" className="bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2">
-              Start Evaluating
-              <ArrowRight className="ml-2 h-5 w-5" />
+            </p>
+            <Link href="/dashboard">
+            <Button className="flex items-center justify-center gap-2 bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2 mx-auto">
+                Start Evaluating
+                <ArrowRight className="h-5 w-5" />
             </Button>
-          </Link>
+            </Link>
         </div>
-      </section>
+        </section>
+
 
       {/* Theory Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-900">
@@ -152,18 +153,19 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-800 to-neutral-900">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Ready to Evaluate Your Models?</h2>
-          <p className="text-xl text-neutral-300 mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Ready to Evaluate Your Models?</h2>
+            <p className="text-xl text-neutral-300 mb-8">
             Start analyzing LLM performance with our comprehensive evaluation dashboard
-          </p>
-          <Link href="/dashboard">
-            <Button size="lg" className="text-lg px-8 py-3 bg-neutral-700 hover:bg-neutral-600 text-white border-0">
-              Access Dashboard
-              <ArrowRight className="ml-2 h-5 w-5" />
+            </p>
+            <Link href="/dashboard">
+            <Button className="flex items-center justify-center gap-2 text-lg px-8 py-3 bg-neutral-700 hover:bg-neutral-600 text-white border-0 mx-auto">
+                Access Dashboard
+                <ArrowRight className="h-5 w-5" />
             </Button>
-          </Link>
+            </Link>
         </div>
-      </section>
+        </section>
+
 
       {/* Footer */}
       <footer className="bg-neutral-900 text-white py-8 px-4 sm:px-6 lg:px-8">
