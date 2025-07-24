@@ -164,7 +164,7 @@ export default function LinguisticAnalysisPage() {
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Linguistic Quality</h3>
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Total Linguistic Quality</h3>
               <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.linguistic_quality_score.toFixed(3)}
               </p>

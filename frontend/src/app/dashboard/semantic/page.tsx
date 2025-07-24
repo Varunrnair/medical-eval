@@ -21,7 +21,7 @@ export default function SemanticAnalysisPage() {
   // New bottom graphs data
   const semanticMetricsBar = useMemo(() => {
     if (data.length === 0) return null
-    return createBarChartData(data, ["cosine_similarity", "bert_score_f1", "vyakyarth_similarity"])
+    return createBarChartData(data, ["cosine_similarity", "bert_score_f1", "vyakyarth_similarity", "cohere_similarity"])
   }, [data])
 
   const fiveSemanticRadar = useMemo(() => {
@@ -29,6 +29,7 @@ export default function SemanticAnalysisPage() {
     return createRadarChartData(data, [
       "cosine_similarity",
       "vyakyarth_similarity",
+      "cohere_similarity",
       "bert_score_f1",
       "semantic_similarity",
     ])
@@ -60,14 +61,15 @@ export default function SemanticAnalysisPage() {
     const avgCosine = data.reduce((sum, item) => sum + item.cosine_similarity, 0) / data.length
     const avgBert = data.reduce((sum, item) => sum + item.bert_score_f1, 0) / data.length
     const avgVyakyarth = data.reduce((sum, item) => sum + item.vyakyarth_similarity, 0) / data.length
+    const avgCohere = data.reduce((sum, item) => sum + item.cohere_similarity, 0) / data.length
 
     return {
-      labels: ["Cosine Similarity", "BERT Score F1", "Vyakyarth Similarity"],
+      labels: ["Cosine Similarity", "BERT Score F1", "Vyakyarth Similarity", "Cohere Similarity"],
       datasets: [
         {
-          data: [avgCosine, avgBert, avgVyakyarth],
-          backgroundColor: ["#3B82F6", "#14B8A6", "#6B7280"],
-          borderColor: ["#9CA3AF", "#D1D5DB", "#6B7280"],
+          data: [avgCosine, avgBert, avgVyakyarth, avgCohere],
+          backgroundColor: ["#3B82F6", "#14B8A6", "#6B7280", "#F59E42"],
+          borderColor: ["#9CA3AF", "#D1D5DB", "#6B7280", "#F59E42"],
           borderWidth: 2,
         },
       ],
@@ -79,7 +81,7 @@ export default function SemanticAnalysisPage() {
   const chartData = useMemo(() => {
     if (!selectedData) return { barData: null, radarData: null }
 
-    const semanticFields = ["cosine_similarity", "bert_score_f1", "semantic_similarity", "vyakyarth_similarity"]
+    const semanticFields = ["cosine_similarity", "bert_score_f1", "vyakyarth_similarity", "cohere_similarity", "semantic_similarity"]
     const mockData = [selectedData]
 
     return {
@@ -142,31 +144,39 @@ export default function SemanticAnalysisPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Cosine Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
+              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.cosine_similarity.toFixed(3)}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">BERT Score F1</h3>
-              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
+              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.bert_score_f1.toFixed(3)}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Semantic Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
-                {selectedData.semantic_similarity.toFixed(3)}
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Vyakyarth Similarity</h3>
+              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.vyakyarth_similarity.toFixed(3)}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Vyakyarth Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-neutral-100 dark:text-neutral-100">
-                {selectedData.vyakyarth_similarity.toFixed(3)}
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Cohere Similarity "embed-multilingual-v3.0"</h3>
+              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.cohere_similarity.toFixed(3)}
               </p>
             </div>
+
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
+              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Total Semantic Similarity</h3>
+              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.semantic_similarity.toFixed(3)}
+              </p>
+            </div>
+
           </div>
         </div>
       )}
