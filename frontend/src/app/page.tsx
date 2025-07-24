@@ -1,158 +1,177 @@
 "use client"
 
-import { useDataSource } from "@/hooks/use-data-source"
-import MetricsCards from "@/components/charts/metrics-cards"
-import ChartContainer from "@/components/charts/chart-container"
-import BarChart from "@/components/charts/bar-chart"
-import PieChart from "@/components/charts/pie-chart"
-import { createMetricCards, createBarChartData, createPieChartData, createRadarChartData } from "@/lib/chart-utils"
-import { useMemo } from "react"
-import RowSelector from "@/components/ui/row-selector"
-import { useSelectedQuestion } from "@/hooks/use-selected-question"
+import Link from "next/link"
+import { ArrowRight, Brain, BarChart3, MessageSquare, Target } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function HomePage() {
-  const { data: mainData, loading: mainLoading } = useDataSource("scored-final-dataset")
-  const { data: semanticData, loading: semanticLoading } = useDataSource("semantic-detailed")
-  const { data: linguisticData, loading: linguisticLoading } = useDataSource("linguistic-detailed")
-
-  // New top graphs data
-  const categoryAverageChart = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createBarChartData(mainData, ["medical_quality_score", "semantic_similarity", "linguistic_quality_score"])
-  }, [mainData])
-
-  const multiMetricRadarChart = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createRadarChartData(mainData, [
-      "medical_quality_score",
-      "semantic_similarity",
-      "linguistic_quality_score",
-      "bleu_score",
-      "rouge_l_score",
-      "meteor_score",
-    ])
-  }, [mainData])
-
-  const medicalMetrics = useMemo(() => {
-    if (mainData.length === 0) return []
-    return createMetricCards(mainData, ["medical_quality_score"])
-  }, [mainData])
-
-  const semanticMetrics = useMemo(() => {
-    if (semanticData.length === 0) return []
-    return createMetricCards(semanticData, ["avg_cosine_similarity", "avg_bert_score_f1", "avg_semantic_similarity"])
-  }, [semanticData])
-
-  const linguisticMetrics = useMemo(() => {
-    if (linguisticData.length === 0) return []
-    return createMetricCards(linguisticData, ["avg_bleu_score", "avg_meteor_score", "avg_rouge_l_score", "avg_perplexity_score"])
-  }, [linguisticData])
-
-  const allMetricsChart = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createBarChartData(mainData, ["medical_quality_score", "semantic_similarity", "linguistic_quality_score"])
-  }, [mainData])
-
-  const medicalDistribution = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createPieChartData(mainData, "medical_quality_score")
-  }, [mainData])
-
-  const [selectedIndex] = useSelectedQuestion()
-  const selectedData = selectedIndex !== null ? mainData[selectedIndex] : null
-
-  if (mainLoading || semanticLoading || linguisticLoading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>
-  }
-
   return (
-    <div className="space-y-6 min-h-screen">
-      <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-        <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-3">Home</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          This page shows average scores across the entire dataset for medical QA evaluation.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">Medical Quality</h3>
-            <p className="text-gray-700 dark:text-gray-400">
-              Measures accuracy, completeness, and medical correctness of responses
-            </p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">Semantic Similarity</h3>
-            <p className="text-gray-700 dark:text-gray-400">
-              Evaluates how semantically similar the response is to the gold standard
-            </p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">Linguistic Quality</h3>
-            <p className="text-gray-700 dark:text-gray-400">
-              Assesses language fluency, grammar, and readability of responses
-            </p>
+    <div className="min-h-screen bg-neutral-950">
+      {/* Navigation */}
+      <nav className="border-b border-neutral-800 bg-neutral-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <Brain className="h-8 w-8 text-teal-400" />
+              <span className="text-xl font-bold text-white">Medical QA Evaluator</span>
+            </div>
+            <Link href="/dashboard">
+                <Button className="bg-neutral-700 hover:bg-neutral-700 px-6 whitespace-nowrap">
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+          </Link>
           </div>
         </div>
-      </div>
+      </nav>
 
-      <RowSelector data={mainData} />
-
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Medical Quality Scores</h2>
-          <MetricsCards metrics={medicalMetrics} />
-        </div>
-
-        <div>
-          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Semantic Similarity Scores</h2>
-          <MetricsCards metrics={semanticMetrics} />
-        </div>
-
-        <div>
-          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Linguistic Quality Scores</h2>
-          <MetricsCards metrics={linguisticMetrics} />
-        </div>
-      </div>
-
-      {selectedData && (
-        <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-          <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white mb-2">Selected Question Final Score</h2>
-          <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
-            {(
-              ((selectedData.medical_quality_score +
-                selectedData.semantic_similarity +
-                selectedData.linguistic_quality_score) /
-                3) *
-              100
-            ).toFixed(1)}
-            %
+      {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            Advanced LLM Evaluation for
+            <span className="bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent block">
+              Medical Question Answering
+            </span>
+          </h1>
+          <p className="text-lg text-neutral-300 mb-8 leading-relaxed">
+            Comprehensive analysis and comparison of Large Language Model responses against gold standard medical
+            answers using multi-dimensional evaluation metrics.
           </p>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Average of Medical Quality ({(selectedData.medical_quality_score * 100).toFixed(1)}%), Semantic Similarity (
-            {(selectedData.semantic_similarity * 100).toFixed(1)}%), and Linguistic Quality (
-            {(selectedData.linguistic_quality_score * 100).toFixed(1)}%)
-          </p>
+          <Link href="/dashboard">
+            <Button size="lg" className="bg-neutral-700 hover:bg-neutral-600 text-white px-6 py-2">
+              Start Evaluating
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
-      )}
+      </section>
 
-      {/* New bottom graphs */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {allMetricsChart && (
-          <ChartContainer title="Overall Performance Comparison">
-            <BarChart data={allMetricsChart} />
-          </ChartContainer>
-        )}
+      {/* Theory Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold text-white mb-4">Evaluation Framework</h2>
+            <p className="text-lg text-neutral-300">
+              Our comprehensive evaluation system analyzes LLM responses across multiple dimensions
+            </p>
+          </div>
 
-        {medicalDistribution && (
-          <ChartContainer title="Medical Quality Score Distribution">
-            <p className="text-xs text-neutral-400 mb-2">This chart shows the proportion of answers falling into different medical quality score ranges (e.g., high, medium, low) across the dataset.</p>
-            <div className="w-full flex flex-col items-center">
-              <div className="max-w-md w-full h-60 mx-auto bg-white dark:bg-neutral-800 rounded-xl">
-                <PieChart data={medicalDistribution} />
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-neutral-850 hover:shadow-2xl shadow-md transition-all duration-300">
+              <CardHeader>
+                <Target className="h-10 w-10 text-teal-400 mb-4" />
+                <CardTitle className="text-xl text-white">Medical Quality</CardTitle>
+                <CardDescription className="text-sm text-neutral-300">
+                  Evaluates medical accuracy, completeness, context awareness, communication quality, and terminology
+                  accessibility
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-neutral-300 space-y-2">
+                  <li>• Medical Accuracy Assessment</li>
+                  <li>• Completeness Evaluation</li>
+                  <li>• Context Awareness Analysis</li>
+                  <li>• Communication Quality Review</li>
+                  <li>• Terminology Accessibility Check</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-neutral-850 hover:shadow-2xl shadow-md transition-all duration-300">
+              <CardHeader>
+                <MessageSquare className="h-10 w-10 text-indigo-400 mb-4" />
+                <CardTitle className="text-xl text-white">Semantic Similarity</CardTitle>
+                <CardDescription className="text-sm text-neutral-300">
+                  Measures semantic alignment between LLM responses and gold standard answers using advanced NLP metrics
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-neutral-300 space-y-2">
+                  <li>• Cosine Similarity Analysis</li>
+                  <li>• BERT Score F1 Evaluation</li>
+                  <li>• Semantic Similarity Scoring</li>
+                  <li>• Vyakyarth Similarity Metrics</li>
+                  <li>• Cross-metric Correlation</li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-neutral-850 hover:shadow-2xl shadow-md transition-all duration-300">
+              <CardHeader>
+                <BarChart3 className="h-10 w-10 text-purple-400 mb-4" />
+                <CardTitle className="text-xl text-white">Linguistic Quality</CardTitle>
+                <CardDescription className="text-sm text-neutral-300">
+                  Analyzes language fluency, grammar, readability, and overall linguistic quality of responses
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="text-sm text-neutral-300 space-y-2">
+                  <li>• BLEU Score Assessment</li>
+                  <li>• METEOR Score Analysis</li>
+                  <li>• ROUGE-L Score Evaluation</li>
+                  <li>• Linguistic Quality Metrics</li>
+                  <li>• Readability Analysis</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Methodology Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-neutral-950">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-white mb-8 text-center">How It Works</h2>
+          <div className="space-y-8">
+            {["Dataset Selection", "Multi-Model Comparison", "Comprehensive Analysis"].map((title, i) => (
+              <div key={i} className="flex items-start space-x-4">
+                <div className="flex-shrink-0 w-8 h-8 border-2 border-teal-400 text-teal-400 rounded-full flex items-center justify-center font-semibold">
+                  {i + 1}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+                  <p className="text-neutral-300">
+                    {title === "Dataset Selection"
+                      ? "Choose from multiple medical QA datasets to evaluate LLM performance across different medical domains and question types."
+                      : title === "Multi-Model Comparison"
+                      ? "Compare responses from multiple LLM models against gold standard answers using our comprehensive evaluation framework."
+                      : "Get detailed insights through interactive visualizations, performance metrics, and comparative analysis across all evaluation dimensions."}
+                  </p>
+                </div>
               </div>
+            ))}
           </div>
-          </ChartContainer>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-neutral-800 to-neutral-900">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Ready to Evaluate Your Models?</h2>
+          <p className="text-xl text-neutral-300 mb-8">
+            Start analyzing LLM performance with our comprehensive evaluation dashboard
+          </p>
+          <Link href="/dashboard">
+            <Button size="lg" className="text-lg px-8 py-3 bg-neutral-700 hover:bg-neutral-600 text-white border-0">
+              Access Dashboard
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-neutral-900 text-white py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <Brain className="h-6 w-6 text-teal-400" />
+            <span className="text-lg font-semibold">Medical QA Evaluator</span>
+          </div>
+          <p className="text-neutral-500 text-sm">Advanced LLM evaluation for medical question answering</p>
+        </div>
+      </footer>
     </div>
   )
 }
