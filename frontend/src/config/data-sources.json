@@ -32,6 +32,19 @@
       "lastUpdated": "2024-01-01T00:00:00Z"
     },
     {
+      "id": "medical-2-quality-detailed",
+      "name": "Medical 2 Quality Detailed Scores",
+      "description": "Detailed breakdown of medical 2 quality evaluation with rubric scores",
+      "filePath": "/medical_2_quality_detailed_scores.csv",
+      "schema": {
+        "question": "string",
+        "medical_quality_score": "number",
+        "axis_scores": "object"
+      },
+      "visualizations": ["radar", "bar"],
+      "lastUpdated": "2024-01-01T00:00:00Z"
+    },
+    {
       "id": "linguistic-detailed",
       "name": "Linguistic Quality Scores",
       "description": "Average linguistic quality metrics including BLEU, METEOR, and ROUGE scores",
@@ -56,6 +69,35 @@
         "avg_semantic_similarity": "number"
       },
       "visualizations": ["bar", "metrics"],
+      "lastUpdated": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "medical-3-detailed",
+      "name": "Medical 3 Detailed Scores",
+      "description": "Detailed breakdown of medical 3 evaluation with rubric and theme scores",
+      "filePath": "/medical_3/scored_dataset_detailed.csv",
+      "schema": {
+        "index": "number",
+        "Theme": "string",
+        "question": "string",
+        "llm_response": "string",
+        "medical_quality_score": "number",
+        "axis_scores": "object",
+        "rubric_counts_by_axis": "object",
+        "rubric_scores_by_axis": "object",
+        "all_rubric_scores_flat": "object",
+        "Accuracy_score": "number",
+        "Accuracy_rubric_count": "number",
+        "Completeness_score": "number",
+        "Completeness_rubric_count": "number",
+        "Context Awareness_score": "number",
+        "Context Awareness_rubric_count": "number",
+        "Communication_score": "number",
+        "Communication_rubric_count": "number",
+        "Terminology Accessibility_score": "number",
+        "Terminology Accessibility_rubric_count": "number"
+      },
+      "visualizations": ["bar", "radar", "metrics"],
       "lastUpdated": "2024-01-01T00:00:00Z"
     }
   ]

@@ -42,7 +42,8 @@ export interface MedicalQualityDetailed {
   rubric_scores: string
   classification: string
   axis_scores: string
-  medical_quality_score: number
+  medical_quality_score: number;
+  medical_quality_score_2?: number;
 }
 
 export interface LinguisticScores {

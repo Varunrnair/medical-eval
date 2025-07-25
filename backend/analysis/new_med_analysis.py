@@ -9,7 +9,7 @@ load_dotenv()
 
 class MedicalQualityEvaluator:
     def __init__(self, dataset_path: str):
-        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.dataset_path = dataset_path
         
         if not os.path.exists(dataset_path):
@@ -76,7 +76,7 @@ class MedicalQualityEvaluator:
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                response = self.openai_client.chat.completions.create(
+                response = self.client.chat.completions.create(
                     model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
@@ -250,11 +250,11 @@ IMPORTANT: Return ONLY a JSON object where:
 - Include an "unclassified" key with an empty array (should remain empty)
 
 Example format:
-{
+{{
   "Accuracy": ["rubric text 1", "rubric text 2"],
   "Completeness": ["rubric text 3", "rubric text 4"],
   "unclassified": []
-}
+}}
 
 JSON Response:"""
 
@@ -299,6 +299,7 @@ JSON Response:"""
         except json.JSONDecodeError as e:
             print(f"JSON decode error in rubric classification: {e}")
             return {}
+            
 
     def calculate_axis_scores(self, rubric_scores: Dict[str, int], classification: Dict[str, List[str]]) -> Dict[str, float]:
         """Enhanced axis score calculation with validation"""
@@ -316,9 +317,11 @@ JSON Response:"""
                     print(f"Warning: No valid scores found for axis '{axis}' with {len(rubrics)} rubrics")
         return axis_scores
 
+
     def calculate_medical_quality_score(self, axis_scores: Dict[str, float]) -> float:
         """Calculate weighted medical quality score"""
         return sum(axis_scores.get(axis, 0.0) * self.axis_weights.get(axis, 0.0) for axis in self.selected_axes)
+
 
     def run_and_update_scores(self) -> None:
         """Enhanced main evaluation loop with fixed rubrics integration"""
@@ -404,18 +407,18 @@ JSON Response:"""
         
         # Critical fix: Ensure alignment between scores and dataframe
         assert len(medical_scores) == len(self.df), f"Score length mismatch: {len(medical_scores)} vs {len(self.df)}"
-        
-        self.df['medical_quality_score'] = medical_scores
+        self.df['medical_quality_score_2'] = medical_scores
         self.detailed_df = pd.DataFrame(detailed_rows)
-        
         print(f"Evaluation complete. Average medical quality score: {sum(medical_scores)/len(medical_scores):.3f}")
+
 
     def save_updated_dataset(self, output_path: str):
         """Save updated dataset with directory creation"""
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         self.df.to_csv(output_path, index=False)
         print(f"Updated dataset saved to: {output_path}")
-        
+
+
     def save_detailed_scores(self, detailed_output_path: str):
         """Save detailed scores with directory creation"""
         os.makedirs(os.path.dirname(detailed_output_path), exist_ok=True)

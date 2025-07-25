@@ -12,8 +12,14 @@ LINGUISTIC_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/l
 LINGUISTIC_SUMMARY_PATH = "/Users/vrn/Work/medical_eval/frontend/public/linguistic_detailed_scores.csv"
 SEMANTIC_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/semantic_scored_dataset.csv"
 SEMANTIC_SUMMARY_PATH = "/Users/vrn/Work/medical_eval/frontend/public/semantic_detailed_scores.csv"
-MEDICAL_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/scored_final_dataset.csv"
+MEDICAL_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_detailed_scores.csv"
 MEDICAL_DETAILED_SCORES_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_quality_detailed_scores.csv"
+
+MEDICAL_2_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/scored_final_dataset.csv"
+MEDICAL_2_DETAILED_SCORES_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_2_quality_detailed_scores.csv"
+
+MEDICAL_3_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/scored_final_dataset.csv"
+MEDICAL_3_DETAILED_SCORES_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_3_quality_detailed_scores.csv"
 QUESTION_COLUMN = "Questions"
 
 

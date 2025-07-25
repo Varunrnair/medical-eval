@@ -10,13 +10,17 @@ from config import (
     SEMANTIC_SCORED_DATASET_PATH,
     SEMANTIC_SUMMARY_PATH,
     MEDICAL_SCORED_DATASET_PATH,
-    MEDICAL_DETAILED_SCORES_PATH
+    MEDICAL_DETAILED_SCORES_PATH,
+    MEDICAL_2_SCORED_DATASET_PATH,
+    MEDICAL_2_DETAILED_SCORES_PATH,
+    MEDICAL_3_SCORED_DATASET_PATH,
+    MEDICAL_3_DETAILED_SCORES_PATH,
 )
 from generate_llm_response import PregnancyLLMResponder
 from analysis.linguistic_analysis import LinguisticAnalyzer
 from analysis.semantic_analysis import SemanticAnalyzer
 from analysis.medical_analysis import MedicalQualityEvaluator
-
+from analysis.new_med_analysis import MedicalQualityEvaluator as NewMedicalQualityEvaluator  # new import
 
 
 def check_file_exists(file_path: str) -> bool:
@@ -74,18 +78,31 @@ def run_semantic_analysis() -> bool:
 
 
 def run_medical_quality_evaluation() -> bool:
-    print("\n=== Step 4: Medical Quality Evaluation ===")
+    print("\n=== Step 4: Medical Quality Evaluation (Old) ===")
     try:
         evaluator = MedicalQualityEvaluator(SEMANTIC_SCORED_DATASET_PATH)
         evaluator.run_and_update_scores()
         evaluator.save_updated_dataset(MEDICAL_SCORED_DATASET_PATH)
         evaluator.save_detailed_scores(MEDICAL_DETAILED_SCORES_PATH)
-        print("✓ Medical quality evaluation completed")
+        print("✓ Medical quality evaluation (old) completed")
         return True
     except Exception as e:
-        print(f"✗ Error in medical quality evaluation: {e}")
+        print(f"✗ Error in medical quality evaluation (old): {e}")
         return False
 
+
+def run_new_medical_quality_evaluation() -> bool:
+    print("\n=== Step 5: Medical Quality Evaluation (New) ===")
+    try:
+        new_evaluator = NewMedicalQualityEvaluator(MEDICAL_SCORED_DATASET_PATH)
+        new_evaluator.run_and_update_scores()
+        new_evaluator.save_updated_dataset(MEDICAL_2_SCORED_DATASET_PATH)
+        new_evaluator.save_detailed_scores(MEDICAL_2_DETAILED_SCORES_PATH)
+        print("✓ Medical quality evaluation (new) completed")
+        return True
+    except Exception as e:
+        print(f"✗ Error in medical quality evaluation (new): {e}")
+        return False
 
 
 def main() -> bool:
@@ -105,7 +122,11 @@ def main() -> bool:
         return False
 
     if not run_medical_quality_evaluation():
-        print("Pipeline failed at Step 4 (Medical Quality Evaluation)")
+        print("Pipeline failed at Step 4 (Medical Quality Evaluation - Old)")
+        return False
+
+    if not run_new_medical_quality_evaluation():
+        print("Pipeline failed at Step 5 (Medical Quality Evaluation - New)")
         return False
 
     print("\n" + "=" * 50)
