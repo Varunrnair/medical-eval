@@ -5,6 +5,7 @@ import ThemeToggle from "@/components/ui/theme-toggle"
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { navigation } from "@/config/navigation"
+import Image from "next/image"
 
 const METRIC_SECTIONS = [
   {
@@ -88,7 +89,13 @@ export default function Header() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <h1 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">{getPageTitle(pathname)}</h1>
+          {/* Logo for mobile, full text for desktop */}
+          <Link href="/" className="flex items-center">
+            <span className="block sm:hidden">
+              <Image src="/icons/simppl_icon.png" alt="Logo" width={28} height={28} className="h-7 w-7 object-contain" />
+            </span>
+            <span className="hidden sm:block text-base md:text-lg font-semibold text-gray-900 dark:text-white ml-2">{getPageTitle(pathname)}</span>
+          </Link>
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -106,7 +113,7 @@ export default function Header() {
       </div>
       {/* Dropdown menu for mobile */}
       {menuOpen && (
-        <div ref={dropdownRef} className="absolute left-0 top-full w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50 sm:hidden shadow-md animate-fade-in">
+        <div ref={dropdownRef} className="absolute left-0 top-full w-full bg-neutral-950 dark:bg-neutral-950 border-b border-neutral-800 dark:border-neutral-800 z-50 sm:hidden shadow-md animate-fade-in">
           <nav className="px-4 py-2 space-y-1">
             {navigation.map((item) => (
               <Link
@@ -114,8 +121,8 @@ export default function Header() {
                 href={item.href}
                 className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   pathname === item.href
-                    ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    ? "bg-neutral-800 dark:bg-neutral-800 text-neutral-100 dark:text-neutral-100"
+                    : "text-neutral-300 dark:text-neutral-300 hover:bg-neutral-900 dark:hover:bg-neutral-900"
                 }`}
                 onClick={() => setMenuOpen(false)}
               >
