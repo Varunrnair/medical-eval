@@ -23,7 +23,7 @@ export default function Medical2AnalysisPage() {
   const [selectedIndex] = useSelectedQuestion()
   const [barModalOpen, setBarModalOpen] = useState(false);
   const [stackedBarModalOpen, setStackedBarModalOpen] = useState(false);
-  const [trendLineModalOpen, setTrendLineModalOpen] = useState(false);yes
+  const [trendLineModalOpen, setTrendLineModalOpen] = useState(false);
 
   const selectedData = useMemo(() => {
     if (selectedIndex === null || !data[selectedIndex]) return null
