@@ -2,7 +2,7 @@ import nltk
 import torch
 import numpy as np
 import pandas as pd
-from typing import List, Dict
+from typing import List
 from rouge_score import rouge_scorer
 from nltk.translate.meteor_score import meteor_score
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
@@ -20,9 +20,9 @@ except LookupError:
 
 class LinguisticAnalyzer:
     def __init__(self, dataset_path: str):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.rouge_scorer = rouge_scorer.RougeScorer(['rougeL'], use_stemmer=True)
         self.smoothing = SmoothingFunction()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
         self.model = GPT2LMHeadModel.from_pretrained("gpt2").to(self.device)
         self.model.eval()
@@ -33,6 +33,7 @@ class LinguisticAnalyzer:
 
 
     def compute_bleu_score(self, reference: str, candidate: str) -> float:
+        # Tokenization required for BLEU calculation; lowercasing as minimal preprocessing
         try:
             ref_tokens = nltk.word_tokenize(reference.lower())
             cand_tokens = nltk.word_tokenize(candidate.lower())
@@ -42,6 +43,7 @@ class LinguisticAnalyzer:
 
 
     def compute_meteor_score(self, reference: str, candidate: str) -> float:
+        # Tokenization required for METEOR calculation; lowercasing as minimal preprocessing
         try:
             ref_tokens = nltk.word_tokenize(reference.lower())
             cand_tokens = nltk.word_tokenize(candidate.lower())
@@ -52,6 +54,7 @@ class LinguisticAnalyzer:
 
 
     def compute_rouge_l_score(self, reference: str, candidate: str) -> float:
+        # Tokenization required for ROUGE-L calculation; lowercasing as minimal preprocessing
         try:
             ref_str = " ".join(nltk.word_tokenize(reference.lower()))
             cand_str = " ".join(nltk.word_tokenize(candidate.lower()))
@@ -63,6 +66,7 @@ class LinguisticAnalyzer:
 
 
     def compute_perplexity_score(self, sentence: str) -> float:
+        # No explicit tokenization needed; uses GPT2 tokenizer internally
         try:
             encodings = self.tokenizer(sentence, return_tensors="pt")
             input_ids = encodings.input_ids.to(self.device)
@@ -80,24 +84,29 @@ class LinguisticAnalyzer:
         meteor_scores = []
         rouge_l_scores = []
         perplexity_scores = []
+
         for ref, cand in zip(self.references, self.candidates):
             bleu_scores.append(self.compute_bleu_score(ref, cand))
             meteor_scores.append(self.compute_meteor_score(ref, cand))
             rouge_l_scores.append(self.compute_rouge_l_score(ref, cand))
             perplexity_scores.append(self.compute_perplexity_score(cand))
-        linguistic_quality_score = [(b + m + r) / 3.0 for b, m, r in zip(bleu_scores, meteor_scores, rouge_l_scores)]
+
+        # Linguistic quality excludes perplexity
+        linguistic_quality_score = [
+            (b + m + r) / 3.0 for b, m, r in zip(bleu_scores, meteor_scores, rouge_l_scores)
+        ]
 
         self.df["bleu_score"] = bleu_scores
         self.df["meteor_score"] = meteor_scores
         self.df["rouge_l_score"] = rouge_l_scores
         self.df["perplexity"] = perplexity_scores
         self.df["linguistic_quality_score"] = linguistic_quality_score
+
         print("Linguistic scoring complete. Files saved.")
 
 
     def save_updated_dataset(self, output_path: str):
-        avg_perplexity = float(np.mean(self.df["perplexity"]))
-        self.df["avg_perplexity_score"] = avg_perplexity
+        # Only saving updated dataframe; avg perplexity already included in summary
         self.df.to_csv(output_path, index=False)
 
 

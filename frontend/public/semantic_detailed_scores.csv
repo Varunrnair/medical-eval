@@ -1,2 +1,2 @@
-avg_cosine_similarity,avg_bert_score_f1,avg_vyakyarth_similarity,avg_cohere_similarity,avg_semantic_similarity
-0.8162195960680644,0.8832836508750915,0.7818907618522644,0.8346963094382921,0.8447331854604826
+avg_sbert_similarity,avg_vyakyarth_similarity,avg_distiluse_similarity,avg_labse_similarity,avg_cohere_similarity,avg_voyage_similarity,avg_openai_similarity,avg_bert_score_f1,avg_semantic_similarity
+0.8162196,0.7818908,0.7504889,0.71161157,0.8346553638263283,0.9125191519854698,0.7636361606623716,0.8832836508750915,0.8067881488873058
