@@ -20,122 +20,115 @@ from generate_llm_response import PregnancyLLMResponder
 from analysis.linguistic_analysis import LinguisticAnalyzer
 from analysis.semantic_analysis import SemanticAnalyzer
 from analysis.medical_analysis import MedicalQualityEvaluator
-from analysis.new_med_analysis import MedicalQualityEvaluator as NewMedicalQualityEvaluator  # new import
+from analysis.new_med_analysis import MedicalQualityEvaluator as NewMedicalQualityEvaluator
 
 
-def check_file_exists(file_path: str) -> bool:
-    return Path(file_path).exists()
+
+def file_exists(path: str) -> bool:
+    """Check if a file already exists at given path."""
+    return Path(path).exists()
 
 
-def run_llm_response_generation() -> bool:
+def run_llm_generation() -> bool:
+    """Step 1: Generate or load LLM responses."""
     print("=== Step 1: LLM Response Generation ===")
-    if check_file_exists(LLM_RESPONSES_OUTPUT_PATH):
-        print(f"✓ LLM responses file already exists at: {LLM_RESPONSES_OUTPUT_PATH}")
-        print("Skipping LLM response generation...")
+    if file_exists(LLM_RESPONSES_OUTPUT_PATH):
+        print(f"✓ Responses already at {LLM_RESPONSES_OUTPUT_PATH}, skipping step.")
         return True
 
-    print("Generating LLM responses...")
     try:
-        llm_responder = PregnancyLLMResponder()
-        llm_responder.generate_llm_responses(
+        responder = PregnancyLLMResponder()
+        responder.generate_llm_responses(
             csv_path=INPUT_DATASET_PATH,
             output_path=LLM_RESPONSES_OUTPUT_PATH,
-            question_column=QUESTION_COLUMN
+            question_column=QUESTION_COLUMN,
         )
-        print("✓ LLM response generation completed")
+        print("✓ LLM responses generated successfully.")
         return True
-    except Exception as e:
-        print(f"✗ Error in LLM response generation: {e}")
+    except Exception as err:
+        print(f"✗ LLM generation error: {err}")
         return False
 
 
 def run_linguistic_analysis() -> bool:
+    """Step 2: Score responses for linguistic quality."""
     print("\n=== Step 2: Linguistic Analysis ===")
     try:
-        analyzer = LinguisticAnalyzer(LLM_RESPONSES_OUTPUT_PATH)
-        analyzer.run_and_update_scores()
-        analyzer.save_updated_dataset(LINGUISTIC_SCORED_DATASET_PATH)
-        analyzer.save_summary_scores(LINGUISTIC_SUMMARY_PATH)
-        print("✓ Linguistic analysis completed")
+        linguist = LinguisticAnalyzer(LLM_RESPONSES_OUTPUT_PATH)
+        linguist.run_and_update_scores()
+        linguist.save_updated_dataset(LINGUISTIC_SCORED_DATASET_PATH)
+        linguist.save_summary_scores(LINGUISTIC_SUMMARY_PATH)
+        print("✓ Linguistic analysis complete.")
         return True
-    except Exception as e:
-        print(f"✗ Error in linguistic analysis: {e}")
+    except Exception as err:
+        print(f"✗ Linguistic analysis error: {err}")
         return False
 
 
 def run_semantic_analysis() -> bool:
+    """Step 3: Score responses for semantic similarity."""
     print("\n=== Step 3: Semantic Analysis ===")
     try:
-        analyzer = SemanticAnalyzer(LINGUISTIC_SCORED_DATASET_PATH)
-        analyzer.run_and_update_scores()
-        analyzer.save_updated_dataset(SEMANTIC_SCORED_DATASET_PATH)
-        analyzer.save_summary_scores(SEMANTIC_SUMMARY_PATH)
-        print("✓ Semantic analysis completed")
+        semantic = SemanticAnalyzer(LINGUISTIC_SCORED_DATASET_PATH)
+        semantic.run_and_update_scores()
+        semantic.save_updated_dataset(SEMANTIC_SCORED_DATASET_PATH)
+        semantic.save_summary_scores(SEMANTIC_SUMMARY_PATH)
+        print("✓ Semantic analysis complete.")
         return True
-    except Exception as e:
-        print(f"✗ Error in semantic analysis: {e}")
+    except Exception as err:
+        print(f"✗ Semantic analysis error: {err}")
         return False
 
 
-def run_medical_quality_evaluation() -> bool:
-    print("\n=== Step 4: Medical Quality Evaluation (Old) ===")
+def run_medical_evaluation_old() -> bool:
+    """Step 4: Evaluate medical quality with legacy evaluator."""
+    print("\n=== Step 4: Medical Quality Evaluation (Legacy) ===")
     try:
-        evaluator = MedicalQualityEvaluator(SEMANTIC_SCORED_DATASET_PATH)
-        evaluator.run_and_update_scores()
-        evaluator.save_updated_dataset(MEDICAL_SCORED_DATASET_PATH)
-        evaluator.save_detailed_scores(MEDICAL_DETAILED_SCORES_PATH)
-        print("✓ Medical quality evaluation (old) completed")
+        legacy_eval = MedicalQualityEvaluator(SEMANTIC_SCORED_DATASET_PATH)
+        legacy_eval.run_and_update_scores()
+        legacy_eval.save_updated_dataset(MEDICAL_SCORED_DATASET_PATH)
+        legacy_eval.save_detailed_scores(MEDICAL_DETAILED_SCORES_PATH)
+        print("✓ Legacy medical evaluation complete.")
         return True
-    except Exception as e:
-        print(f"✗ Error in medical quality evaluation (old): {e}")
+    except Exception as err:
+        print(f"✗ Legacy medical evaluation error: {err}")
         return False
 
 
-def run_new_medical_quality_evaluation() -> bool:
-    print("\n=== Step 5: Medical Quality Evaluation (New) ===")
+def run_medical_evaluation_new() -> bool:
+    """Step 5: Evaluate medical quality with updated evaluator."""
+    print("\n=== Step 5: Medical Quality Evaluation (Updated) ===")
     try:
-        new_evaluator = NewMedicalQualityEvaluator(MEDICAL_SCORED_DATASET_PATH)
-        new_evaluator.run_and_update_scores()
-        new_evaluator.save_updated_dataset(MEDICAL_2_SCORED_DATASET_PATH)
-        new_evaluator.save_detailed_scores(MEDICAL_2_DETAILED_SCORES_PATH)
-        print("✓ Medical quality evaluation (new) completed")
+        new_eval = NewMedicalQualityEvaluator(MEDICAL_SCORED_DATASET_PATH)
+        new_eval.run_and_update_scores()
+        new_eval.save_updated_dataset(MEDICAL_2_SCORED_DATASET_PATH)
+        new_eval.save_detailed_scores(MEDICAL_2_DETAILED_SCORES_PATH)
+        print("✓ Updated medical evaluation complete.")
         return True
-    except Exception as e:
-        print(f"✗ Error in medical quality evaluation (new): {e}")
+    except Exception as err:
+        print(f"✗ Updated medical evaluation error: {err}")
         return False
 
 
-def main() -> bool:
+def main() -> None:
+    """Execute the full evaluation pipeline in five sequential steps."""
     print("Starting Medical QA Evaluation Pipeline...")
     print("=" * 50)
-
-    if not run_llm_response_generation():
-        print("Pipeline failed at Step 1 (LLM Response Generation)")
-        return False
-
-    if not run_linguistic_analysis():
-        print("Pipeline failed at Step 2 (Linguistic Analysis)")
-        return False
-
-    if not run_semantic_analysis():
-        print("Pipeline failed at Step 3 (Semantic Analysis)")
-        return False
-
-    if not run_medical_quality_evaluation():
-        print("Pipeline failed at Step 4 (Medical Quality Evaluation - Old)")
-        return False
-
-    if not run_new_medical_quality_evaluation():
-        print("Pipeline failed at Step 5 (Medical Quality Evaluation - New)")
-        return False
-
+    steps = [
+        run_llm_generation,
+        run_linguistic_analysis,
+        run_semantic_analysis,
+        run_medical_evaluation_old,
+        run_medical_evaluation_new,
+    ]
+    for step in steps:
+        if not step():
+            print(f"Pipeline aborted at {step.__name__}.")
+            sys.exit(1)
     print("\n" + "=" * 50)
-    print("✓ Complete Medical QA Evaluation Pipeline Finished Successfully!")
+    print("✓ Pipeline completed successfully.")
     print("=" * 50)
-    return True
 
 
 if __name__ == "__main__":
-    success = main()
-    if not success:
-        sys.exit(1)
+    main()
