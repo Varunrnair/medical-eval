@@ -15,7 +15,7 @@ export default function HomePage() {
   const { data: semanticData, loading: semanticLoading } = useDataSource("semantic-detailed")
   const { data: linguisticData, loading: linguisticLoading } = useDataSource("linguistic-detailed")
 
-  // New top graphs data
+  // Updated top graphs data with new field names
   const categoryAverageChart = useMemo(() => {
     if (mainData.length === 0) return null
     return createBarChartData(mainData, ["medical_quality_score", "semantic_similarity", "linguistic_quality_score"])
@@ -40,12 +40,12 @@ export default function HomePage() {
 
   const semanticMetrics = useMemo(() => {
     if (semanticData.length === 0) return []
-    return createMetricCards(semanticData, ["avg_cosine_similarity", "avg_bert_score_f1", "avg_semantic_similarity"])
+    return createMetricCards(semanticData, ["avg_sbert_similarity", "avg_bert_score_f1", "avg_semantic_similarity"])
   }, [semanticData])
 
   const linguisticMetrics = useMemo(() => {
     if (linguisticData.length === 0) return []
-    return createMetricCards(linguisticData, ["avg_bleu_score", "avg_meteor_score", "avg_rouge_l_score", "avg_perplexity_score"])
+    return createMetricCards(linguisticData, ["avg_bleu_score", "avg_meteor_score", "avg_rouge_l_score", "avg_perplexity"])
   }, [linguisticData])
 
   const allMetricsChart = useMemo(() => {
@@ -68,7 +68,7 @@ export default function HomePage() {
   return (
     <div className="space-y-6 min-h-screen">
       <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-        <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-3">Home</h1>
+        <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-3">Overview</h1>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
           This page shows average scores across the entire dataset for medical QA evaluation.
         </p>
@@ -82,7 +82,7 @@ export default function HomePage() {
           <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
             <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">Semantic Similarity</h3>
             <p className="text-gray-700 dark:text-gray-400">
-              Evaluates how semantically similar the response is to the gold standard
+              Evaluates how semantically similar the response is to the gold standard using multiple embedding models
             </p>
           </div>
           <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
@@ -134,8 +134,8 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* New bottom graphs */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Updated bottom graphs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {allMetricsChart && (
           <ChartContainer title="Overall Performance Comparison">
             <BarChart data={allMetricsChart} />
@@ -149,7 +149,7 @@ export default function HomePage() {
               <div className="max-w-md w-full h-60 mx-auto bg-white dark:bg-neutral-800 rounded-xl">
                 <PieChart data={medicalDistribution} />
               </div>
-          </div>
+            </div>
           </ChartContainer>
         )}
       </div>

@@ -9,11 +9,27 @@
         "Theme": "string",
         "Questions": "string",
         "Answer": "text",
-        "medical_quality_score": "number",
-        "semantic_similarity": "number",
-        "linguistic_quality_score": "number",
+        "Hindi": "string",
+        "Marathi": "string",
+        "References": "string",
+        "llm_response": "string",
         "bleu_score": "number",
-        "rouge_l_score": "number"
+        "meteor_score": "number",
+        "rouge_l_score": "number",
+        "perplexity": "number",
+        "linguistic_quality_score": "number",
+        "language": "string",
+        "sbert_similarity": "number",
+        "vyakyarth_similarity": "number",
+        "distiluse_similarity": "number",
+        "labse_similarity": "number",
+        "cohere_similarity": "number",
+        "voyage_similarity": "number",
+        "openai_similarity": "number",
+        "bert_score_f1": "number",
+        "semantic_similarity": "number",
+        "medical_quality_score": "number",
+        "medical_quality_score_2": "number"
       },
       "visualizations": ["pie", "radar", "bar", "metrics"],
       "lastUpdated": "2024-01-01T00:00:00Z"
@@ -25,8 +41,13 @@
       "filePath": "/medical_quality_detailed_scores.csv",
       "schema": {
         "question": "string",
-        "medical_quality_score": "number",
-        "axis_scores": "object"
+        "gold_standard_answer": "string",
+        "llm_response": "string",
+        "rubrics": "string",
+        "rubric_scores": "string",
+        "classification": "string",
+        "axis_scores": "string",
+        "medical_quality_score": "number"
       },
       "visualizations": ["radar", "bar"],
       "lastUpdated": "2024-01-01T00:00:00Z"
@@ -38,8 +59,15 @@
       "filePath": "/medical_2_quality_detailed_scores.csv",
       "schema": {
         "question": "string",
-        "medical_quality_score": "number",
-        "axis_scores": "object"
+        "gold_standard_answer": "string",
+        "llm_response": "string",
+        "generated_rubrics": "string",
+        "fixed_rubrics": "string",
+        "all_rubrics": "string",
+        "rubric_scores": "string",
+        "classification": "string",
+        "axis_scores": "string",
+        "medical_quality_score": "number"
       },
       "visualizations": ["radar", "bar"],
       "lastUpdated": "2024-01-01T00:00:00Z"
@@ -53,6 +81,7 @@
         "avg_bleu_score": "number",
         "avg_meteor_score": "number",
         "avg_rouge_l_score": "number",
+        "avg_perplexity": "number",
         "avg_linguistic_quality_score": "number"
       },
       "visualizations": ["bar", "metrics"],
@@ -60,11 +89,17 @@
     },
     {
       "id": "semantic-detailed",
-      "name": "Semantic Similarity Scores",
-      "description": "Average semantic similarity metrics including cosine similarity and BERT scores",
+      "name": "Semantic Quality Scores",
+      "description": "Average semantic similarity metrics including SBERT, Vyakyarth, DistilUSE, LaBSE, Cohere, Voyage, OpenAI, and BERTScore",
       "filePath": "/semantic_detailed_scores.csv",
       "schema": {
-        "avg_cosine_similarity": "number",
+        "avg_sbert_similarity": "number",
+        "avg_vyakyarth_similarity": "number",
+        "avg_distiluse_similarity": "number",
+        "avg_labse_similarity": "number",
+        "avg_cohere_similarity": "number",
+        "avg_voyage_similarity": "number",
+        "avg_openai_similarity": "number",
         "avg_bert_score_f1": "number",
         "avg_semantic_similarity": "number"
       },

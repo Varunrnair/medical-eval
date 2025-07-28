@@ -18,18 +18,31 @@ export default function SemanticAnalysisPage() {
   const [barModalOpen, setBarModalOpen] = useState(false);
   const [lineModalOpen, setLineModalOpen] = useState(false);
 
-  // New bottom graphs data
+  // Updated semantic metrics with new field names
   const semanticMetricsBar = useMemo(() => {
     if (data.length === 0) return null
-    return createBarChartData(data, ["cosine_similarity", "bert_score_f1", "vyakyarth_similarity", "cohere_similarity"])
+    return createBarChartData(data, [
+      "sbert_similarity", 
+      "vyakyarth_similarity", 
+      "distiluse_similarity", 
+      "labse_similarity",
+      "cohere_similarity",
+      "voyage_similarity",
+      "openai_similarity",
+      "bert_score_f1"
+    ])
   }, [data])
 
-  const fiveSemanticRadar = useMemo(() => {
+  const semanticRadar = useMemo(() => {
     if (data.length === 0) return null
     return createRadarChartData(data, [
-      "cosine_similarity",
-      "vyakyarth_similarity",
+      "sbert_similarity",
+      "vyakyarth_similarity", 
+      "distiluse_similarity",
+      "labse_similarity",
       "cohere_similarity",
+      "voyage_similarity",
+      "openai_similarity",
       "bert_score_f1",
       "semantic_similarity",
     ])
@@ -58,18 +71,37 @@ export default function SemanticAnalysisPage() {
   const contributionDonut = useMemo(() => {
     if (data.length === 0) return null
 
-    const avgCosine = data.reduce((sum, item) => sum + item.cosine_similarity, 0) / data.length
-    const avgBert = data.reduce((sum, item) => sum + item.bert_score_f1, 0) / data.length
-    const avgVyakyarth = data.reduce((sum, item) => sum + item.vyakyarth_similarity, 0) / data.length
-    const avgCohere = data.reduce((sum, item) => sum + item.cohere_similarity, 0) / data.length
+    const avgSbert = data.reduce((sum, item) => sum + (item.sbert_similarity || 0), 0) / data.length
+    const avgVyakyarth = data.reduce((sum, item) => sum + (item.vyakyarth_similarity || 0), 0) / data.length
+    const avgDistiluse = data.reduce((sum, item) => sum + (item.distiluse_similarity || 0), 0) / data.length
+    const avgLabse = data.reduce((sum, item) => sum + (item.labse_similarity || 0), 0) / data.length
+    const avgCohere = data.reduce((sum, item) => sum + (item.cohere_similarity || 0), 0) / data.length
+    const avgVoyage = data.reduce((sum, item) => sum + (item.voyage_similarity || 0), 0) / data.length
+    const avgOpenai = data.reduce((sum, item) => sum + (item.openai_similarity || 0), 0) / data.length
+    const avgBert = data.reduce((sum, item) => sum + (item.bert_score_f1 || 0), 0) / data.length
 
     return {
-      labels: ["Cosine Similarity", "BERT Score F1", "Vyakyarth Similarity", "Cohere Similarity"],
+      labels: [
+        "SBERT Similarity", 
+        "Vyakyarth Similarity", 
+        "DistilUSE Similarity",
+        "LaBSE Similarity",
+        "Cohere Similarity",
+        "Voyage Similarity",
+        "OpenAI Similarity",
+        "BERT Score F1"
+      ],
       datasets: [
         {
-          data: [avgCosine, avgBert, avgVyakyarth, avgCohere],
-          backgroundColor: ["#3B82F6", "#14B8A6", "#6B7280", "#F59E42"],
-          borderColor: ["#9CA3AF", "#D1D5DB", "#6B7280", "#F59E42"],
+          data: [avgSbert, avgVyakyarth, avgDistiluse, avgLabse, avgCohere, avgVoyage, avgOpenai, avgBert],
+          backgroundColor: [
+            "#3B82F6", "#14B8A6", "#6B7280", "#F59E42", 
+            "#8B5CF6", "#EF4444", "#10B981", "#F97316"
+          ],
+          borderColor: [
+            "#9CA3AF", "#D1D5DB", "#6B7280", "#F59E42",
+            "#A78BFA", "#FCA5A5", "#6EE7B7", "#FDBA74"
+          ],
           borderWidth: 2,
         },
       ],
@@ -81,7 +113,17 @@ export default function SemanticAnalysisPage() {
   const chartData = useMemo(() => {
     if (!selectedData) return { barData: null, radarData: null }
 
-    const semanticFields = ["cosine_similarity", "bert_score_f1", "vyakyarth_similarity", "cohere_similarity", "semantic_similarity"]
+    const semanticFields = [
+      "sbert_similarity", 
+      "vyakyarth_similarity", 
+      "distiluse_similarity",
+      "labse_similarity",
+      "cohere_similarity",
+      "voyage_similarity",
+      "openai_similarity",
+      "bert_score_f1",
+      "semantic_similarity"
+    ]
     const mockData = [selectedData]
 
     return {
@@ -99,8 +141,7 @@ export default function SemanticAnalysisPage() {
       <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
         <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-2">Semantic Analysis</h1>
         <p className="text-gray-600 dark:text-gray-400">
-          Measuring semantic similarity between LLM responses and gold standard answers using cosine similarity, BERT
-          scores, and custom similarity metrics.
+          Measuring semantic similarity between LLM responses and gold standard answers using multiple embedding models including SBERT, Vyakyarth, DistilUSE, LaBSE, Cohere, Voyage, OpenAI, and BERTScore.
         </p>
       </div>
 
@@ -141,50 +182,93 @@ export default function SemanticAnalysisPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Cosine Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
-                {selectedData.cosine_similarity.toFixed(3)}
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                SBERT Similarity <span className="text-xs text-gray-500">(all-mpnet-base-v2/l3cube-pune)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.sbert_similarity?.toFixed(3) || 'N/A'}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">BERT Score F1</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
-                {selectedData.bert_score_f1.toFixed(3)}
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Vyakyarth Similarity <span className="text-xs text-gray-500">(krutrim-ai-labs/Vyakyarth)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.vyakyarth_similarity?.toFixed(3) || 'N/A'}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Vyakyarth Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
-                {selectedData.vyakyarth_similarity.toFixed(3)}
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                DistilUSE Similarity <span className="text-xs text-gray-500">(distiluse-base-multilingual-cased-v2)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.distiluse_similarity?.toFixed(3) || 'N/A'}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Cohere Similarity "embed-multilingual-v3.0"</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
-                {selectedData.cohere_similarity.toFixed(3)}
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                LaBSE Similarity <span className="text-xs text-gray-500"></span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.labse_similarity?.toFixed(3) || 'N/A'}
               </p>
             </div>
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Total Semantic Similarity</h3>
-              <p className="text-lg md:text-2xl font-bold text-green-600 dark:text-green-400">
-                {selectedData.semantic_similarity.toFixed(3)}
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Cohere Similarity <span className="text-xs text-gray-500">(embed-multilingual-v3.0)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.cohere_similarity?.toFixed(3) || 'N/A'}
               </p>
             </div>
 
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Voyage Similarity <span className="text-xs text-gray-500">(voyage-3.5)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.voyage_similarity?.toFixed(3) || 'N/A'}
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                OpenAI Similarity <span className="text-xs text-gray-500">(text-embedding-3-small)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.openai_similarity?.toFixed(3) || 'N/A'}
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                BERT Score F1 <span className="text-xs text-gray-500"></span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.bert_score_f1?.toFixed(3) || 'N/A'}
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6 md:col-span-2 lg:col-span-4">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Total Semantic Similarity</h3>
+              <p className="text-xl md:text-3xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.semantic_similarity?.toFixed(3) || 'N/A'}
+              </p>
+            </div>
           </div>
         </div>
       )}
 
-      {/* New bottom graphs */}
+      {/* Updated bottom graphs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {semanticMetricsBar && (
-          <ChartContainer title="Semantic Metrics">
+          <ChartContainer title="Semantic Metrics Comparison">
             <div onClick={() => setBarModalOpen(true)} className="w-full h-56 cursor-pointer">
               <BarChart data={semanticMetricsBar} />
             </div>
@@ -198,9 +282,9 @@ export default function SemanticAnalysisPage() {
           </ChartContainer>
         )}
 
-        {fiveSemanticRadar && (
-          <ChartContainer title="Individual Semantic Metrics Radar">
-            <RadarChart data={fiveSemanticRadar} />
+        {semanticRadar && (
+          <ChartContainer title="Semantic Metrics Radar">
+            <RadarChart data={semanticRadar} />
           </ChartContainer>
         )}
       </div>
