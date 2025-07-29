@@ -194,15 +194,6 @@ export default function SemanticAnalysisPage() {
 
             <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
               <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                Vyakyarth Similarity <span className="text-xs text-gray-500">(krutrim-ai-labs/Vyakyarth)</span>
-              </h3>
-              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
-                {selectedData.vyakyarth_similarity?.toFixed(3) || 'N/A'}
-              </p>
-            </div>
-
-            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 DistilUSE Similarity <span className="text-xs text-gray-500">(distiluse-base-multilingual-cased-v2)</span>
               </h3>
               <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
@@ -216,6 +207,15 @@ export default function SemanticAnalysisPage() {
               </h3>
               <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
                 {selectedData.labse_similarity?.toFixed(3) || 'N/A'}
+              </p>
+            </div>
+
+            <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Vyakyarth Similarity <span className="text-xs text-gray-500">(krutrim-ai-labs/Vyakyarth)</span>
+              </h3>
+              <p className="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">
+                {selectedData.vyakyarth_similarity?.toFixed(3) || 'N/A'}
               </p>
             </div>
 
