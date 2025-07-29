@@ -30,7 +30,7 @@ def classify_themes(
     api_key_env: str = "OPENAI_API_KEY",
     model: str = "gpt-3.5-turbo",
     output_path: str = None,
-    max_retries: int = 5
+    max_retries: int = 3
 ) -> None:
     """
     Reads a CSV containing a 'Questions' column, classifies each question
