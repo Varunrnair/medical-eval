@@ -1,17 +1,32 @@
-"use client"
+"use client";
 
-import { usePathname } from "next/navigation"
-import { navigation } from "@/config/navigation"
-import Image from "next/image"
-import Link from "next/link"
+import { usePathname } from "next/navigation";
+import { navigation } from "@/config/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { useModel } from "@/contexts/ModelContext";
+import Dropdown from "@/components/ui/dropdown";
 
 export default function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const { selectedModel, availableModels, setSelectedModel, isLoading } =
+    useModel();
+
+  // Format model names for display
+  const modelOptions = availableModels.map((model) => ({
+    value: model,
+    label: model.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+  }));
 
   return (
     <div className="bg-neutral-100 dark:bg-neutral-900 w-52 min-h-screen border-r border-neutral-200 dark:border-neutral-800 hidden sm:block relative">
-      <div className="px-5 py-6"> {/* Increased vertical padding here */}
-        <Link href="/" className="group flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 transition-all duration-200 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105 cursor-pointer">
+      <div className="px-5 py-6">
+        {" "}
+        {/* Increased vertical padding here */}
+        <Link
+          href="/"
+          className="group flex items-center gap-2 text-base font-semibold text-neutral-900 dark:text-neutral-100 transition-all duration-200 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105 cursor-pointer"
+        >
           <Image
             src="/icons/simppl_icon.png"
             alt=""
@@ -21,6 +36,21 @@ export default function Sidebar() {
           />
           <span>Medical QA</span>
         </Link>
+      </div>
+
+      {/* Model Selection */}
+      <div className="px-3 mb-4">
+        <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">
+          Select Model
+        </label>
+        <Dropdown
+          options={modelOptions}
+          value={selectedModel}
+          onChange={setSelectedModel}
+          placeholder="Loading models..."
+          disabled={isLoading}
+          className="w-full"
+        />
       </div>
 
       <nav className="px-2">
@@ -42,7 +72,5 @@ export default function Sidebar() {
         </div>
       </nav>
     </div>
-  )
+  );
 }
-
-

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { fetchCsvData } from "@/lib/api";
 import { useModel } from "@/contexts/ModelContext";
 
-export function useDataSource(sourceId: string | null) {
+export function useModelData(sourceId: string | null) {
   const [data, setData] = useState<any[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,5 +40,11 @@ export function useDataSource(sourceId: string | null) {
     loadData();
   }, [sourceId, selectedModel]);
 
-  return { data, columns, loading, error };
+  return {
+    data,
+    columns,
+    loading,
+    error,
+    selectedModel
+  };
 }
