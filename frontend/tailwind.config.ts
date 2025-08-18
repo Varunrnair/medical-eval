@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss"
+import type { Config } from "tailwindcss";
 
 // all in fixtures is set to tailwind v3 as interims solutions
 
@@ -68,17 +68,17 @@ const config: Config = {
         },
       },
       fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'md': ['1.125rem', { lineHeight: '1.75rem' }],
-        'lg': ['1.25rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.5rem', { lineHeight: '2rem' }],
-        '2xl': ['1.75rem', { lineHeight: '2.25rem' }],
-        '3xl': ['2rem', { lineHeight: '2.5rem' }],
-        '4xl': ['2.25rem', { lineHeight: '2.75rem' }],
-        '5xl': ['2.5rem', { lineHeight: '3rem' }],
-        '6xl': ['3rem', { lineHeight: '1' }],
+        xs: ["0.625rem", { lineHeight: "0.875rem" }],
+        sm: ["0.75rem", { lineHeight: "1rem" }],
+        base: ["0.875rem", { lineHeight: "1.25rem" }],
+        md: ["1rem", { lineHeight: "1.5rem" }],
+        lg: ["1.125rem", { lineHeight: "1.75rem" }],
+        xl: ["1.25rem", { lineHeight: "1.75rem" }],
+        "2xl": ["1.5rem", { lineHeight: "2rem" }],
+        "3xl": ["1.75rem", { lineHeight: "2.25rem" }],
+        "4xl": ["2rem", { lineHeight: "2.5rem" }],
+        "5xl": ["2.25rem", { lineHeight: "2.75rem" }],
+        "6xl": ["2.5rem", { lineHeight: "3rem" }],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -110,5 +110,5 @@ const config: Config = {
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;

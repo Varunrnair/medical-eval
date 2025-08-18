@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import ThemeToggle from "@/components/ui/theme-toggle";
+
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { navigation } from "@/config/navigation";
@@ -163,7 +163,7 @@ export default function Header() {
               />
             </span>
             <div className="hidden sm:block ml-2">
-              <div className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
+              <div className="text-sm md:text-base font-semibold text-gray-900 dark:text-white">
                 {getPageTitle(pathname)}
               </div>
               {selectedModel && (
@@ -177,7 +177,7 @@ export default function Header() {
             </div>
           </Link>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           <button
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Show metric info"
@@ -204,7 +204,6 @@ export default function Header() {
               />
             </svg>
           </button>
-          <ThemeToggle />
         </div>
       </div>
       {/* Dropdown menu for mobile */}
@@ -218,7 +217,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`flex items-center px-3 py-2 text-xs font-medium rounded-md transition-colors ${
                   pathname === item.href
                     ? "bg-neutral-800 dark:bg-neutral-800 text-neutral-100 dark:text-neutral-100"
                     : "text-neutral-300 dark:text-neutral-300 hover:bg-neutral-900 dark:hover:bg-neutral-900"
@@ -255,13 +254,13 @@ export default function Header() {
                 />
               </svg>
             </button>
-            <h2 className="text-lg font-semibold mb-4 md:mb-6 text-gray-900 dark:text-white">
+            <h2 className="text-base font-semibold mb-4 md:mb-6 text-gray-900 dark:text-white">
               Metric Explanations
             </h2>
             <div className="space-y-4 md:space-y-6">
               {METRIC_SECTIONS.map((section, idx) => (
                 <div key={section.title}>
-                  <h3 className="text-base font-bold text-blue-700 dark:text-blue-300 mb-2 md:mb-3">
+                  <h3 className="text-sm font-bold text-blue-700 dark:text-blue-300 mb-2 md:mb-3">
                     {section.title}
                   </h3>
                   {section.extra && (
@@ -269,7 +268,7 @@ export default function Header() {
                       {section.extra}
                     </div>
                   )}
-                  <ul className="space-y-3 text-sm">
+                  <ul className="space-y-3 text-xs">
                     {section.metrics.map((metric) => (
                       <li key={metric.name}>
                         <span className="font-bold text-gray-800 dark:text-gray-200">

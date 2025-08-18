@@ -1,57 +1,57 @@
-"use client"
+"use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react"
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface ModelContextType {
-  selectedModel: string
-  availableModels: string[]
-  setSelectedModel: (model: string) => void
-  isLoading: boolean
+  selectedModel: string;
+  availableModels: string[];
+  setSelectedModel: (model: string) => void;
+  isLoading: boolean;
 }
 
-const ModelContext = createContext<ModelContextType | undefined>(undefined)
+const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
 export function ModelProvider({ children }: { children: React.ReactNode }) {
-  const [selectedModel, setSelectedModelState] = useState<string>("")
-  const [availableModels, setAvailableModels] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [selectedModel, setSelectedModelState] = useState<string>("");
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch available models from the public directory
   useEffect(() => {
     const fetchAvailableModels = async () => {
       try {
-        const response = await fetch('/api/models')
+        const response = await fetch("/api/models");
         if (response.ok) {
-          const models = await response.json()
-          setAvailableModels(models)
+          const models = await response.json();
+          setAvailableModels(models);
 
           // Set the first model as default if none is selected
           if (models.length > 0 && !selectedModel) {
-            setSelectedModelState(models[0])
+            setSelectedModelState(models[0]);
           }
         }
       } catch (error) {
-        console.error('Failed to fetch available models:', error)
+        console.error("Failed to fetch available models:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
     fetchAvailableModels()
   }, [])
 
   // Load selected model from localStorage on mount
   useEffect(() => {
-    const savedModel = localStorage.getItem('selectedModel')
+    const savedModel = localStorage.getItem("selectedModel");
     if (savedModel && availableModels.includes(savedModel)) {
-      setSelectedModelState(savedModel)
+      setSelectedModelState(savedModel);
     }
-  }, [availableModels])
+  }, [availableModels]);
 
   const setSelectedModel = (model: string) => {
-    setSelectedModelState(model)
-    localStorage.setItem('selectedModel', model)
-  }
+    setSelectedModelState(model);
+    localStorage.setItem("selectedModel", model);
+  };
 
   return (
     <ModelContext.Provider
@@ -59,18 +59,18 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
         selectedModel,
         availableModels,
         setSelectedModel,
-        isLoading
+        isLoading,
       }}
     >
       {children}
     </ModelContext.Provider>
-  )
+  );
 }
 
 export function useModel() {
-  const context = useContext(ModelContext)
+  const context = useContext(ModelContext);
   if (context === undefined) {
-    throw new Error('useModel must be used within a ModelProvider')
+    throw new Error("useModel must be used within a ModelProvider");
   }
-  return context
+  return context;
 }

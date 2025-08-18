@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react";
 
 interface DropdownOption {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 interface DropdownProps {
-  options: DropdownOption[]
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
-  disabled?: boolean
+  options: DropdownOption[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  disabled?: boolean;
 }
 
 export default function Dropdown({
@@ -22,26 +22,29 @@ export default function Dropdown({
   onChange,
   placeholder = "Select an option",
   className = "",
-  disabled = false
+  disabled = false,
 }: DropdownProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-  const selectedOption = options.find(option => option.value === value)
+  const selectedOption = options.find((option) => option.value === value);
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
@@ -64,7 +67,12 @@ export default function Dropdown({
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
@@ -85,8 +93,8 @@ export default function Dropdown({
                     : "text-neutral-900 dark:text-neutral-100"
                 }`}
                 onClick={() => {
-                  onChange(option.value)
-                  setIsOpen(false)
+                  onChange(option.value);
+                  setIsOpen(false);
                 }}
               >
                 {option.label}
@@ -96,5 +104,5 @@ export default function Dropdown({
         </div>
       )}
     </div>
-  )
+  );
 }
