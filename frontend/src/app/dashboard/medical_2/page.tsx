@@ -18,8 +18,8 @@ import type { MedicalQualityDetailed } from "@/types/data";
 import Modal from "@/components/ui/modal";
 
 export default function Medical2AnalysisPage() {
-  // Use the new data source for medical_2
-  const { data, loading, error } = useDataSource("medical-2-quality-detailed") as { data: MedicalQualityDetailed[], loading: boolean, error: string | null }
+  // Use unified dataset
+  const { data, loading, error } = useDataSource("scored-final-dataset") as { data: any[], loading: boolean, error: string | null }
   const [selectedIndex] = useSelectedQuestion()
   const [barModalOpen, setBarModalOpen] = useState(false);
   const [stackedBarModalOpen, setStackedBarModalOpen] = useState(false);
@@ -29,9 +29,9 @@ export default function Medical2AnalysisPage() {
     if (selectedIndex === null || !data[selectedIndex]) return null
     const item = data[selectedIndex]
     try {
-      const axisScores = safeJsonParse(item.axis_scores)
-      const rubricScores = safeJsonParse(item.rubric_scores)
-      const rubrics = safeJsonParse(item.all_rubrics)
+      const axisScores = safeJsonParse(item.m2_axis_scores)
+      const rubricScores = safeJsonParse(item.m2_rubric_scores)
+      const rubrics = safeJsonParse(item.m2_all_rubrics)
       return { ...item, parsedAxisScores: axisScores, parsedRubricScores: rubricScores, parsedRubrics: rubrics }
     } catch {
       return item
@@ -53,7 +53,7 @@ export default function Medical2AnalysisPage() {
   const horizontalBarData = useMemo(() => {
     if (data.length === 0) return null;
     // Use the 'medical_quality_score' column (not _2)
-    const scores = data.map((item, index) => item.medical_quality_score);
+    const scores = data.map((item, index) => item.medical_quality_score_2 || 0);
     const labels = data.map((item, index) => `Q${index + 1}`);
     return {
       labels,
@@ -74,8 +74,8 @@ export default function Medical2AnalysisPage() {
     try {
       const firstItem = data[0];
       let axisScores: any = null;
-      if (typeof firstItem === "object" && 'axis_scores' in firstItem) {
-        axisScores = safeJsonParse((firstItem as any).axis_scores);
+      if (typeof firstItem === "object" && 'm2_axis_scores' in firstItem) {
+        axisScores = safeJsonParse((firstItem as any).m2_axis_scores);
       }
       if (!axisScores) return null;
       const mockData = [axisScores];
@@ -125,8 +125,8 @@ export default function Medical2AnalysisPage() {
           data: data.map((item) => {
             try {
               let axisScores: any = null;
-              if (typeof item === "object" && 'axis_scores' in item) {
-                axisScores = safeJsonParse((item as any).axis_scores);
+              if (typeof item === "object" && 'm2_axis_scores' in item) {
+                axisScores = safeJsonParse((item as any).m2_axis_scores);
               }
               return axisScores && axisScores[key as string] ? axisScores[key as string] : 0;
             } catch {
@@ -174,7 +174,7 @@ export default function Medical2AnalysisPage() {
           Analyzing medical_2 accuracy, completeness, context awareness, communication quality, and terminology accessibility for individual responses.
         </p>
       </div>
-      <RowSelector data={data} questionField="question" />
+      <RowSelector data={data} questionField="Questions" />
       {selectedData && (
         <div className="space-y-6">
           {/* If required fields are missing, show a message */}
@@ -209,11 +209,11 @@ export default function Medical2AnalysisPage() {
               <div className="space-y-4">
                 <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.question}</p>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Questions}</p>
                 </div>
                 <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.gold_standard_answer}</p>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Answer}</p>
                 </div>
                 <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">LLM Response</h3>
@@ -254,9 +254,8 @@ export default function Medical2AnalysisPage() {
               {(() => {
                 let mapping: Record<string, string[]> | null = null;
                 try {
-                  mapping = typeof selectedData.classification === 'string'
-                    ? safeJsonParse(selectedData.classification)
-                    : selectedData.classification;
+                  const cls = (selectedData as any).m2_classification;
+                  mapping = typeof cls === 'string' ? safeJsonParse(cls) : cls;
                 } catch {
                   mapping = null;
                 }

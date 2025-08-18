@@ -6,6 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from langdetect import detect
 from typing import Optional
+from config import model_name   
 
 
 
@@ -76,7 +77,7 @@ Answer:"""
             detected_language=detected_language
         )
         response = self.client.chat(
-            model="c4ai-aya-expanse-32b",
+            model=model_name,
             message=prompt,
             max_tokens=150,
             temperature=0.7

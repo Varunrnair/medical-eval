@@ -327,6 +327,10 @@ JSON Response:"""
         """Enhanced main evaluation loop with fixed rubrics integration"""
         medical_scores = []
         detailed_rows = []
+        # Embed detailed data directly into main dataframe columns for simplified storage
+        m2_generated_rubrics_col, m2_fixed_rubrics_col = [], []
+        m2_all_rubrics_col, m2_rubric_scores_col = [], []
+        m2_classification_col, m2_axis_scores_col = [], []
         
         print(f"Processing {len(self.df)} rows...")
         
@@ -386,7 +390,15 @@ JSON Response:"""
                 axis_scores = self.calculate_axis_scores(rubric_scores, complete_classification)
                 medical_score = self.calculate_medical_quality_score(axis_scores)
                 medical_scores.append(medical_score)
-                
+
+                # Append row-wise detailed JSON columns for consolidated CSV
+                m2_generated_rubrics_col.append(json.dumps(generated_rubrics))
+                m2_fixed_rubrics_col.append(json.dumps(self.fixed_rubrics))
+                m2_all_rubrics_col.append(json.dumps(rubrics))
+                m2_rubric_scores_col.append(json.dumps(rubric_scores))
+                m2_classification_col.append(json.dumps(complete_classification))
+                m2_axis_scores_col.append(json.dumps(axis_scores))
+
                 detailed_rows.append({
                     'question': question,
                     'gold_standard_answer': gold_answer,
@@ -408,6 +420,13 @@ JSON Response:"""
         # Critical fix: Ensure alignment between scores and dataframe
         assert len(medical_scores) == len(self.df), f"Score length mismatch: {len(medical_scores)} vs {len(self.df)}"
         self.df['medical_quality_score_2'] = medical_scores
+        # Attach detailed columns (prefixed m2_) to main dataframe
+        self.df['m2_generated_rubrics'] = m2_generated_rubrics_col
+        self.df['m2_fixed_rubrics'] = m2_fixed_rubrics_col
+        self.df['m2_all_rubrics'] = m2_all_rubrics_col
+        self.df['m2_rubric_scores'] = m2_rubric_scores_col
+        self.df['m2_classification'] = m2_classification_col
+        self.df['m2_axis_scores'] = m2_axis_scores_col
         self.detailed_df = pd.DataFrame(detailed_rows)
         print(f"Evaluation complete. Average medical quality score: {sum(medical_scores)/len(medical_scores):.3f}")
 

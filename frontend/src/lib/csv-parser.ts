@@ -19,12 +19,12 @@ export async function parseCsvFromPath(filePath: string): Promise<any[]> {
       Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
-        transform: (value, field) => {
-          if (typeof field === "string" && (field.includes("score") || field.includes("similarity") || field.includes("perplexity"))) {
-            const num = Number.parseFloat(value)
-            return isNaN(num) ? value : num
-          }
-          return value
+        transform: (value) => {
+          // Try to coerce to number for any numeric-looking value (covers summary files)
+          const trimmed = typeof value === "string" ? value.trim() : value
+          if (trimmed === "" || trimmed === null || trimmed === undefined) return value
+          const num = Number(trimmed)
+          return Number.isFinite(num) ? num : value
         },
         complete: (results) => {
           if (results.errors.length > 0) {

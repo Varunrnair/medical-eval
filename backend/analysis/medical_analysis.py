@@ -293,6 +293,9 @@ JSON Response:"""
         """Enhanced main evaluation loop with better error handling"""
         medical_scores = []
         detailed_rows = []
+        # Embed detailed data directly into main dataframe columns for simplified storage
+        m1_rubrics_col, m1_rubric_scores_col = [], []
+        m1_classification_col, m1_axis_scores_col = [], []
         
         print(f"Processing {len(self.df)} rows...")
         
@@ -321,6 +324,13 @@ JSON Response:"""
                 axis_scores = self.calculate_axis_scores(rubric_scores, classification)
                 medical_score = self.calculate_medical_quality_score(axis_scores)
                 medical_scores.append(medical_score)
+
+                # Append row-wise detailed JSON columns for consolidated CSV
+                m1_rubrics_col.append(json.dumps(rubrics))
+                m1_rubric_scores_col.append(json.dumps(rubric_scores))
+                m1_classification_col.append(json.dumps(classification))
+                m1_axis_scores_col.append(json.dumps(axis_scores))
+
                 detailed_rows.append({
                     'question': question,
                     'gold_standard_answer': gold_answer,
@@ -340,6 +350,11 @@ JSON Response:"""
         assert len(medical_scores) == len(self.df), f"Score length mismatch: {len(medical_scores)} vs {len(self.df)}"
         
         self.df['medical_quality_score'] = medical_scores
+        # Attach detailed columns (prefixed m1_) to main dataframe
+        self.df['m1_rubrics'] = m1_rubrics_col
+        self.df['m1_rubric_scores'] = m1_rubric_scores_col
+        self.df['m1_classification'] = m1_classification_col
+        self.df['m1_axis_scores'] = m1_axis_scores_col
         self.detailed_df = pd.DataFrame(detailed_rows)
         
         print(f"Evaluation complete. Average medical quality score: {sum(medical_scores)/len(medical_scores):.3f}")

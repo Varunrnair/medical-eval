@@ -5,6 +5,7 @@ from typing import List
 import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
+from config import JUDGE_MODEL
 load_dotenv()
 
 
@@ -28,7 +29,7 @@ THEMES: List[str] = [
 def classify_themes(
     csv_path: str,
     api_key_env: str = "OPENAI_API_KEY",
-    model: str = "gpt-3.5-turbo",
+    model=JUDGE_MODEL,
     output_path: str = None,
     max_retries: int = 3
 ) -> None:

@@ -11,57 +11,60 @@ import RowSelector from "@/components/ui/row-selector"
 import { useSelectedQuestion } from "@/hooks/use-selected-question"
 
 export default function HomePage() {
-  const { data: mainData, loading: mainLoading } = useDataSource("scored-final-dataset")
-  const { data: semanticData, loading: semanticLoading } = useDataSource("semantic-detailed")
-  const { data: linguisticData, loading: linguisticLoading } = useDataSource("linguistic-detailed")
+  const { data: summaryData, loading: mainLoading } = useDataSource("summary-scores")
 
   // Updated top graphs data with new field names
   const categoryAverageChart = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createBarChartData(mainData, ["medical_quality_score", "semantic_similarity", "linguistic_quality_score"])
-  }, [mainData])
+    if (summaryData.length === 0) return null
+    return createBarChartData(summaryData.filter((r) => typeof r.med1 === 'number'), ["med1", "semantic", "ling"])
+  }, [summaryData])
 
   const multiMetricRadarChart = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createRadarChartData(mainData, [
-      "medical_quality_score",
-      "semantic_similarity",
-      "linguistic_quality_score",
-      "bleu_score",
-      "rouge_l_score",
-      "meteor_score",
+    if (summaryData.length === 0) return null
+    return createRadarChartData(summaryData.filter((r) => typeof r.med1 === 'number'), [
+      "med1",
+      "semantic",
+      "ling",
+      "bleu",
+      "rouge_l",
+      "meteor",
     ])
-  }, [mainData])
+  }, [summaryData])
 
   const medicalMetrics = useMemo(() => {
-    if (mainData.length === 0) return []
-    return createMetricCards(mainData, ["medical_quality_score"])
-  }, [mainData])
-
+    if (summaryData.length === 0) return []
+    const rows = summaryData.filter((r) => typeof r.med1 === 'number')
+    return createMetricCards(rows, ["med1", "med2"]) 
+  }, [summaryData])
+  
   const semanticMetrics = useMemo(() => {
-    if (semanticData.length === 0) return []
-    return createMetricCards(semanticData, ["avg_sbert_similarity", "avg_bert_score_f1", "avg_semantic_similarity"])
-  }, [semanticData])
+    if (summaryData.length === 0) return []
+    const rows = summaryData.filter((r) => typeof r.med1 === 'number')
+    return createMetricCards(rows, ["sbert", "cohere", "voyage", "bert", "semantic"])
+  }, [summaryData])
 
   const linguisticMetrics = useMemo(() => {
-    if (linguisticData.length === 0) return []
-    return createMetricCards(linguisticData, ["avg_bleu_score", "avg_meteor_score", "avg_rouge_l_score", "avg_perplexity"])
-  }, [linguisticData])
+    if (summaryData.length === 0) return []
+    const rows = summaryData.filter((r) => typeof r.med1 === 'number')
+    return createMetricCards(rows, ["bleu", "meteor", "rouge_l", "perplexity"])
+  }, [summaryData])
 
   const allMetricsChart = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createBarChartData(mainData, ["medical_quality_score", "semantic_similarity", "linguistic_quality_score"])
-  }, [mainData])
+    if (summaryData.length === 0) return null
+    const rows = summaryData.filter((r) => typeof r.med1 === 'number')
+    return createBarChartData(rows, ["med1", "semantic", "ling"])
+  }, [summaryData])
 
   const medicalDistribution = useMemo(() => {
-    if (mainData.length === 0) return null
-    return createPieChartData(mainData, "medical_quality_score")
-  }, [mainData])
+    if (summaryData.length === 0) return null
+    const rows = summaryData.filter((r) => typeof r.med1 === 'number')
+    return createPieChartData(rows, "med1")
+  }, [summaryData])
 
   const [selectedIndex] = useSelectedQuestion()
-  const selectedData = selectedIndex !== null ? mainData[selectedIndex] : null
+  const selectedData = selectedIndex !== null ? summaryData[selectedIndex] : null
 
-  if (mainLoading || semanticLoading || linguisticLoading) {
+  if (mainLoading) {
     return <div className="flex justify-center items-center h-64">Loading...</div>
   }
 
@@ -94,7 +97,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <RowSelector data={mainData} />
+      <RowSelector data={summaryData} questionField="dataset" />
 
       <div className="space-y-6">
         <div>
@@ -115,21 +118,21 @@ export default function HomePage() {
 
       {selectedData && (
         <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-          <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white mb-2">Selected Question Final Score</h2>
+          <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white mb-2">Selected Dataset Final Score</h2>
           <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
             {(
-              ((selectedData.medical_quality_score +
-                selectedData.semantic_similarity +
-                selectedData.linguistic_quality_score) /
+              ((selectedData.med1 +
+                selectedData.semantic +
+                selectedData.ling) /
                 3) *
               100
             ).toFixed(1)}
             %
           </p>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Average of Medical Quality ({(selectedData.medical_quality_score * 100).toFixed(1)}%), Semantic Similarity (
-            {(selectedData.semantic_similarity * 100).toFixed(1)}%), and Linguistic Quality (
-            {(selectedData.linguistic_quality_score * 100).toFixed(1)}%)
+            Average of Medical Quality ({(selectedData.med1 * 100).toFixed(1)}%), Semantic Similarity (
+            {(selectedData.semantic * 100).toFixed(1)}%), and Linguistic Quality (
+            {(selectedData.ling * 100).toFixed(1)}%)
           </p>
         </div>
       )}

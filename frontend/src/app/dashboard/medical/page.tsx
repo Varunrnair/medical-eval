@@ -15,7 +15,7 @@ import type { MedicalQualityDetailed } from "@/types/data";
 import Modal from "@/components/ui/modal";
 
 export default function MedicalAnalysisPage() {
-  const { data, loading, error } = useDataSource("medical-quality-detailed") as { data: MedicalQualityDetailed[], loading: boolean, error: string | null }
+  const { data, loading, error } = useDataSource("scored-final-dataset") as { data: any[], loading: boolean, error: string | null }
   const [selectedIndex] = useSelectedQuestion()
   const [barModalOpen, setBarModalOpen] = useState(false);
   const [stackedBarModalOpen, setStackedBarModalOpen] = useState(false);
@@ -27,9 +27,9 @@ export default function MedicalAnalysisPage() {
 
     const item = data[selectedIndex]
     try {
-      const axisScores = safeJsonParse(item.axis_scores)
-      const rubricScores = safeJsonParse(item.rubric_scores)
-      const rubrics = safeJsonParse(item.rubrics)
+      const axisScores = safeJsonParse(item.m1_axis_scores)
+      const rubricScores = safeJsonParse(item.m1_rubric_scores)
+      const rubrics = safeJsonParse(item.m1_rubrics)
       return { ...item, parsedAxisScores: axisScores, parsedRubricScores: rubricScores, parsedRubrics: rubrics }
     } catch {
       return item
@@ -76,8 +76,8 @@ export default function MedicalAnalysisPage() {
     try {
       const firstItem = data[0];
       let axisScores: any = null;
-      if (typeof firstItem === "object" && 'axis_scores' in firstItem) {
-        axisScores = safeJsonParse((firstItem as any).axis_scores);
+      if (typeof firstItem === "object" && 'm1_axis_scores' in firstItem) {
+        axisScores = safeJsonParse((firstItem as any).m1_axis_scores);
       }
       if (!axisScores) return null;
       const mockData = [axisScores];
@@ -111,8 +111,8 @@ export default function MedicalAnalysisPage() {
       data.slice(0, 5).forEach((item) => {
         try {
           let axisScores: any = null;
-          if (typeof item === "object" && 'axis_scores' in item) {
-            axisScores = safeJsonParse((item as any).axis_scores);
+          if (typeof item === "object" && 'm1_axis_scores' in item) {
+            axisScores = safeJsonParse((item as any).m1_axis_scores);
           }
           if (axisScores) {
             Object.keys(axisScores).forEach((key) => allAxisKeys.add(key));
@@ -137,8 +137,8 @@ export default function MedicalAnalysisPage() {
           data: data.map((item) => {
             try {
               let axisScores: any = null;
-              if (typeof item === "object" && 'axis_scores' in item) {
-                axisScores = safeJsonParse((item as any).axis_scores);
+              if (typeof item === "object" && 'm1_axis_scores' in item) {
+                axisScores = safeJsonParse((item as any).m1_axis_scores);
               }
               return axisScores && axisScores[key as string] ? axisScores[key as string] : 0;
             } catch {
@@ -193,7 +193,7 @@ export default function MedicalAnalysisPage() {
         </p>
       </div>
 
-      <RowSelector data={data} questionField="question" />
+      <RowSelector data={data} questionField="Questions" />
 
       {selectedData && (
         <div className="space-y-6">
@@ -231,12 +231,12 @@ export default function MedicalAnalysisPage() {
               <div className="space-y-4">
                 <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Question</h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.question}</p>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Questions}</p>
                 </div>
 
                 <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
                   <h3 className="text-xs md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">Gold Standard Answer</h3>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.gold_standard_answer}</p>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{selectedData.Answer}</p>
                 </div>
 
                 <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
@@ -281,9 +281,8 @@ export default function MedicalAnalysisPage() {
               {(() => {
                 let mapping: Record<string, string[]> | null = null;
                 try {
-                  mapping = typeof selectedData.classification === 'string'
-                    ? safeJsonParse(selectedData.classification)
-                    : selectedData.classification;
+                  const cls = (selectedData as any).m1_classification;
+                  mapping = typeof cls === 'string' ? safeJsonParse(cls) : cls;
                 } catch {
                   mapping = null;
                 }

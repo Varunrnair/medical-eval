@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import List, Dict
 from dotenv import load_dotenv
 from openai import OpenAI
-
+from config import JUDGE_MODEL
 load_dotenv()
+
 
 
 class ThemeRubricScorer:
@@ -57,11 +58,12 @@ class ThemeRubricScorer:
 
         print("[Init] Loaded all data and merged llm responses.")
 
+
     def _call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> str:
         for _ in range(3):
             try:
                 resp = self.client.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model=JUDGE_MODEL,
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
                     temperature=temperature
@@ -70,6 +72,7 @@ class ThemeRubricScorer:
             except Exception:
                 continue
         raise RuntimeError("LLM call failed after 3 attempts")
+
 
     def _score_rubrics(self, question: str, response: str, rubrics: List[str]) -> Dict[str, int]:
         rubrics_json = json.dumps(rubrics, indent=2, ensure_ascii=False)
@@ -84,6 +87,7 @@ class ThemeRubricScorer:
         body = out[out.find("{"): out.rfind("}") + 1]
         scores = json.loads(body)
         return {r: scores.get(r, 0) for r in rubrics}
+
 
     def run(self) -> None:
         detailed_rows = []
@@ -155,9 +159,9 @@ class ThemeRubricScorer:
 if __name__ == "__main__":
     scorer = ThemeRubricScorer(
         dataset_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/sample_15_themed.csv",
-        llm_response_source_csv="/Users/vrn/Work/medical_eval/frontend/public/llm_responses.csv",
         classified_rubric_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/theme_rubric_bank_classified.csv",
-        output_dataset_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/scored_dataset_updated.csv",
-        detailed_output_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/scored_dataset_detailed.csv"
+        llm_response_source_csv="/Users/vrn/Work/medical_eval/frontend/public/command_a/llm_responses.csv",
+        output_dataset_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/command_a/scored_dataset_updated.csv",
+        detailed_output_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/command_a/scored_dataset_detailed.csv"
     )
     scorer.run()

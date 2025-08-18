@@ -6,15 +6,10 @@ from config import (
     LLM_RESPONSES_OUTPUT_PATH,
     QUESTION_COLUMN,
     LINGUISTIC_SCORED_DATASET_PATH,
-    LINGUISTIC_SUMMARY_PATH,
     SEMANTIC_SCORED_DATASET_PATH,
-    SEMANTIC_SUMMARY_PATH,
     MEDICAL_SCORED_DATASET_PATH,
-    MEDICAL_DETAILED_SCORES_PATH,
     MEDICAL_2_SCORED_DATASET_PATH,
-    MEDICAL_2_DETAILED_SCORES_PATH,
-    MEDICAL_3_SCORED_DATASET_PATH,
-    MEDICAL_3_DETAILED_SCORES_PATH,
+    SUMMARY_DATASET_PATH,
 )
 from generate_llm_response import PregnancyLLMResponder
 from analysis.linguistic_analysis import LinguisticAnalyzer
@@ -57,7 +52,6 @@ def run_linguistic_analysis() -> bool:
         linguist = LinguisticAnalyzer(LLM_RESPONSES_OUTPUT_PATH)
         linguist.run_and_update_scores()
         linguist.save_updated_dataset(LINGUISTIC_SCORED_DATASET_PATH)
-        linguist.save_summary_scores(LINGUISTIC_SUMMARY_PATH)
         print("✓ Linguistic analysis complete.")
         return True
     except Exception as err:
@@ -72,7 +66,6 @@ def run_semantic_analysis() -> bool:
         semantic = SemanticAnalyzer(LINGUISTIC_SCORED_DATASET_PATH)
         semantic.run_and_update_scores()
         semantic.save_updated_dataset(SEMANTIC_SCORED_DATASET_PATH)
-        semantic.save_summary_scores(SEMANTIC_SUMMARY_PATH)
         print("✓ Semantic analysis complete.")
         return True
     except Exception as err:
@@ -87,7 +80,6 @@ def run_medical_evaluation_old() -> bool:
         legacy_eval = MedicalQualityEvaluator(SEMANTIC_SCORED_DATASET_PATH)
         legacy_eval.run_and_update_scores()
         legacy_eval.save_updated_dataset(MEDICAL_SCORED_DATASET_PATH)
-        legacy_eval.save_detailed_scores(MEDICAL_DETAILED_SCORES_PATH)
         print("✓ Legacy medical evaluation complete.")
         return True
     except Exception as err:
@@ -102,7 +94,6 @@ def run_medical_evaluation_new() -> bool:
         new_eval = NewMedicalQualityEvaluator(MEDICAL_SCORED_DATASET_PATH)
         new_eval.run_and_update_scores()
         new_eval.save_updated_dataset(MEDICAL_2_SCORED_DATASET_PATH)
-        new_eval.save_detailed_scores(MEDICAL_2_DETAILED_SCORES_PATH)
         print("✓ Updated medical evaluation complete.")
         return True
     except Exception as err:
@@ -129,6 +120,52 @@ def main() -> None:
     print("✓ Pipeline completed successfully.")
     print("=" * 50)
 
+    # After pipeline, compute and upsert summary averages (one row per dataset)
+    try:
+        import pandas as pd
+        from pathlib import Path
 
+        final_path = MEDICAL_2_SCORED_DATASET_PATH
+        df = pd.read_csv(final_path)
+
+        def num_mean(frame: pd.DataFrame, col: str) -> float:
+            if col not in frame.columns:
+                return 0.0
+            s = pd.to_numeric(frame[col], errors="coerce")
+            return float(s.mean()) if len(s) else 0.0
+
+        summary_row = {
+            "dataset": Path(INPUT_DATASET_PATH).stem,
+            "rows": int(len(df)),
+            "med1": num_mean(df, "medical_quality_score"),
+            "med2": num_mean(df, "medical_quality_score_2"),
+            "semantic": num_mean(df, "semantic_similarity"),
+            "sbert": num_mean(df, "sbert_similarity"),
+            # "vyakyarth": num_mean(df, "vyakyarth_similarity"),
+            "cohere": num_mean(df, "cohere_similarity"),
+            "voyage": num_mean(df, "voyage_similarity"),
+            "bert": num_mean(df, "bert_score_f1"),
+            "bleu": num_mean(df, "bleu_score"),
+            "meteor": num_mean(df, "meteor_score"),
+            "rouge_l": num_mean(df, "rouge_l_score"),
+            "perplexity": num_mean(df, "perplexity"),
+            "ling": num_mean(df, "linguistic_quality_score"),
+        }
+
+        if Path(SUMMARY_DATASET_PATH).exists():
+            s = pd.read_csv(SUMMARY_DATASET_PATH)
+            if (s["dataset"] == summary_row["dataset"]).any():
+                for k, v in summary_row.items():
+                    s.loc[s["dataset"] == summary_row["dataset"], k] = v
+            else:
+                s = pd.concat([s, pd.DataFrame([summary_row])], ignore_index=True)
+        else:
+            s = pd.DataFrame([summary_row])
+
+        Path(SUMMARY_DATASET_PATH).parent.mkdir(parents=True, exist_ok=True)
+        s.to_csv(SUMMARY_DATASET_PATH, index=False)
+        print(f"✓ Summary scores updated at: {SUMMARY_DATASET_PATH}")
+    except Exception as err:
+        print(f"✗ Failed to update summary scores: {err}")
 if __name__ == "__main__":
     main()

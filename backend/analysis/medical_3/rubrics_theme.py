@@ -5,6 +5,7 @@ from typing import List, Dict
 import pandas as pd
 from dotenv import load_dotenv
 from openai import OpenAI
+from config import JUDGE_MODEL
 load_dotenv()
 
 
@@ -45,7 +46,7 @@ class ThemeRubricGenerator:
         for _ in range(3):
             try:
                 resp = self.client.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model=JUDGE_MODEL,
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
                     temperature=temperature

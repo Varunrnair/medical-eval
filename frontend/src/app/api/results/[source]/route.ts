@@ -10,7 +10,7 @@ export async function GET(request: Request, { params }: { params: { source: stri
       return NextResponse.json({ error: "Data source not found" }, { status: 404 })
     }
 
-    // Use the new file system parser for local files
+    // Parse from unified dataset path
     const csvData = await parseCsvFromPath(sourceConfig.filePath)
     const columns = getColumnNames(csvData)
 

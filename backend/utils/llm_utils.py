@@ -1,19 +1,19 @@
 import openai
 import time
 from typing import Optional, List
-from config import OPENAI_API_KEY, GPT_MODEL, MAX_TOKENS, TEMPERATURE, ANSWER_GENERATION_PROMPT
+from config import OPENAI_API_KEY, JUDGE_MODEL, MAX_TOKENS, TEMPERATURE, ANSWER_GENERATION_PROMPT
 
 # Initialize OpenAI client
 openai.api_key = OPENAI_API_KEY
 
-def call_gpt35(prompt: str, max_tokens: int = MAX_TOKENS, 
+def call_judge_model(prompt: str, max_tokens: int = MAX_TOKENS, 
                temperature: float = TEMPERATURE, max_retries: int = 3) -> Optional[str]:
     """Make API call to GPT-3.5 with retry logic."""
     
     for attempt in range(max_retries):
         try:
             response = openai.chat.completions.create(
-                model=GPT_MODEL,
+                model=JUDGE_MODEL,
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=max_tokens,
                 temperature=temperature
@@ -43,7 +43,7 @@ def generate_model_answer(question: str) -> str:
     """Generate model answer for a given question using GPT-3.5."""
     prompt = ANSWER_GENERATION_PROMPT.format(question=question)
     
-    response = call_gpt35(prompt, max_tokens=500, temperature=0.3)
+    response = call_judge_model(prompt, max_tokens=500, temperature=0.3)
     
     if response:
         return response
@@ -67,7 +67,7 @@ def batch_generate_answers(questions: List[str]) -> List[str]:
 def test_api_connection() -> bool:
     """Test if OpenAI API is working."""
     try:
-        response = call_gpt35("Hello, this is a test.", max_tokens=10)
+        response = call_judge_model("Hello, this is a test.", max_tokens=10)
         return response is not None
     except Exception as e:
         print(f"API connection test failed: {e}")

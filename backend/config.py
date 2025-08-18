@@ -1,34 +1,23 @@
 import os
 
-
-
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
-
 INPUT_DATASET_PATH = "/Users/vrn/Work/medical_eval/backend/data/sample_15.csv"
-LLM_RESPONSES_OUTPUT_PATH =  "/Users/vrn/Work/medical_eval/frontend/public/llm_responses.csv"
-LINGUISTIC_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/linguistic_scored_dataset.csv"
-LINGUISTIC_SUMMARY_PATH = "/Users/vrn/Work/medical_eval/frontend/public/linguistic_detailed_scores.csv"
-SEMANTIC_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/semantic_scored_dataset.csv"
-SEMANTIC_SUMMARY_PATH = "/Users/vrn/Work/medical_eval/frontend/public/semantic_detailed_scores.csv"
-MEDICAL_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_detailed_scores.csv"
-MEDICAL_DETAILED_SCORES_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_quality_detailed_scores.csv"
-
-MEDICAL_2_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/scored_final_dataset.csv"
-MEDICAL_2_DETAILED_SCORES_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_2_quality_detailed_scores.csv"
-
-MEDICAL_3_SCORED_DATASET_PATH = "/Users/vrn/Work/medical_eval/frontend/public/scored_final_dataset.csv"
-MEDICAL_3_DETAILED_SCORES_PATH = "/Users/vrn/Work/medical_eval/frontend/public/medical_3_quality_detailed_scores.csv"
+model_name = "c4ai-aya-expanse-32b"
 QUESTION_COLUMN = "Questions"
-
-
-
-GPT_MODEL = "gpt-3.5-turbo"
+JUDGE_MODEL = "gpt-4o-mini-2024-07-18"
 MAX_TOKENS = 1000
 TEMPERATURE = 0.1
 
 
+FINAL_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/{model_name}/scored_final_dataset.csv"
+SUMMARY_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/{model_name}/summary_scores.csv"
+LLM_RESPONSES_OUTPUT_PATH = FINAL_DATASET_PATH
+LINGUISTIC_SCORED_DATASET_PATH = FINAL_DATASET_PATH
+SEMANTIC_SCORED_DATASET_PATH = FINAL_DATASET_PATH
+MEDICAL_SCORED_DATASET_PATH = FINAL_DATASET_PATH
+MEDICAL_2_SCORED_DATASET_PATH = FINAL_DATASET_PATH
 
 
 RUBRIC_GENERATION_PROMPT = """You are analyzing a set of high-quality, gold-standard medical answers.  

@@ -27,10 +27,8 @@ export interface MedicalQARecord {
   linguistic_quality_score: number
   language: string
   cosine_similarity: number
-  vyakyarth_similarity: number
   bert_score_f1: number
   semantic_similarity: number
-  vyakyarth_semantic_score: number
   medical_quality_score: number
 }
 
@@ -57,7 +55,5 @@ export interface LinguisticScores {
 export interface SemanticScores {
   avg_cosine_similarity: number
   avg_bert_score_f1: number
-  avg_vyakyarth_similarity: number
   avg_semantic_similarity: number
-  avg_vyakyarth_semantic_score: number
 }
