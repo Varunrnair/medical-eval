@@ -9,32 +9,17 @@ import {
   createMetricCards,
   createBarChartData,
   createPieChartData,
-  createRadarChartData,
 } from "@/lib/chart-utils";
 import { useMemo } from "react";
 import RowSelector from "@/components/ui/row-selector";
 import { useSelectedQuestion } from "@/hooks/use-selected-question";
 
+
+
 export default function HomePage() {
   const { data: summaryData, loading: mainLoading } =
     useDataSource("summary-scores");
 
-  // Updated top graphs data with new field names
-  const categoryAverageChart = useMemo(() => {
-    if (summaryData.length === 0) return null;
-    return createBarChartData(
-      summaryData.filter((r) => typeof r.med1 === "number"),
-      ["med1", "semantic", "ling"],
-    );
-  }, [summaryData]);
-
-  const multiMetricRadarChart = useMemo(() => {
-    if (summaryData.length === 0) return null;
-    return createRadarChartData(
-      summaryData.filter((r) => typeof r.med1 === "number"),
-      ["med1", "semantic", "ling", "bleu", "rouge_l", "meteor"],
-    );
-  }, [summaryData]);
 
   const medicalMetrics = useMemo(() => {
     if (summaryData.length === 0) return [];

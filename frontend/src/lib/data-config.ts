@@ -2,7 +2,7 @@ import dataSourcesConfig from "@/config/data-sources.json";
 import type { DataSource, DataSourceConfig } from "@/types/data";
 
 export function getDataSourceConfig(): DataSourceConfig {
-  return dataSourcesConfig as DataSourceConfig;
+  return dataSourcesConfig as unknown as DataSourceConfig;
 }
 
 export function getDataSourceById(
