@@ -1,12 +1,16 @@
+#  Generating the llm response using llama  and then medical quality using gpt 4o mini
+
 import os
 import re
 import pandas as pd
-import cohere
+# import cohere
+from openai import OpenAI # Added for OpenAI
+from together import Together
 from pathlib import Path
 from dotenv import load_dotenv
 from langdetect import detect
 from typing import Optional
-from config import model_name   
+from config import model_name 
 
 
 
@@ -30,7 +34,9 @@ class LanguageDetector:
 
 class PregnancyHealthLLM:
     def __init__(self, api_key: str):
-        self.client = cohere.Client(api_key)
+        # self.client = cohere.Client(api_key)
+        # self.client = OpenAI(api_key=api_key)
+        self.client = Together(api_key=api_key)
         self.prompt_template = """You are a knowledgeable and caring assistant trained to support pregnancy-related health.  
 Your task is to provide accurate, empathetic, and reliable answers to user questions specifically about pregnancy, prenatal care, and postnatal well-being.  
 
@@ -76,22 +82,53 @@ Answer:"""
             question=question,
             detected_language=detected_language
         )
-        response = self.client.chat(
-            model=model_name,
-            message=prompt,
-            max_tokens=150,
-            temperature=0.7
-        )
-        return response.text.strip()
+        
+        # --- Cohere API call (commented out) ---
+        # response = self.client.chat(
+        #     model=model_name,
+        #     message=prompt,
+        #     max_tokens=150,
+        #     temperature=0.7
+        # )
+        # return response.text.strip()
+        
+        # --- OpenAI API call (added) ---
+        # response = self.client.chat.completions.create(
+        #     model=model_name,
+        #     messages=[{"role": "user", "content": prompt}],
+        #     max_tokens=150,
+        #     temperature=0.7
+        # )
+        # return response.choices[0].message.content.strip()
+        try:
+            response = self.client.chat.completions.create(
+                model="meta-llama/Llama-3.3-70B-Instruct-Turbo",                         
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=150,
+                temperature=0.7
+            )
+            # keep compatibility with OpenAI-like response shape
+            text = response.choices[0].message.content if hasattr(response, "choices") else getattr(response, "text", None)
+            if text is None:
+                # some Together SDKs return plain text in response['text']
+                text = response.get("text") if isinstance(response, dict) else str(response)
+            return text.strip()
+        except Exception as e:
+            # raise or return a helpful message — raising is better for batch processing to know failures
+            raise RuntimeError(f"Together API request failed: {e}")
 
 
 
 class PregnancyLLMResponder:
     def __init__(self, api_key: Optional[str] = None):
         load_dotenv()
-        api_key = api_key or os.getenv('COHERE_API_KEY')
+        # api_key = api_key or os.getenv('COHERE_API_KEY')
+        api_key = api_key or os.getenv('TOGETHER_API_KEY')
         if not api_key:
-            raise ValueError("COHERE_API_KEY not found in environment variables.")
+            # Updated error message
+            raise ValueError("TOGETHER_API_KEY not found in environment variables.")
         self.llm = PregnancyHealthLLM(api_key)
         self.detector = LanguageDetector()
 

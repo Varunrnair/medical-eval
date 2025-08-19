@@ -45,12 +45,13 @@ export default function HomePage() {
   const semanticMetrics = useMemo(() => {
     if (summaryData.length === 0) return [];
     const rows = summaryData.filter((r) => typeof r.med1 === "number");
+    // Changed: Removed "semantic" (aggregate) and added "openai"
     return createMetricCards(rows, [
       "sbert",
       "cohere",
       "voyage",
+      "openai",
       "bert",
-      "semantic",
     ]);
   }, [summaryData]);
 
@@ -147,28 +148,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {selectedData && (
-        <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-          <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Selected Dataset Final Score
-          </h2>
-          <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
-            {(
-              ((selectedData.med1 + selectedData.semantic + selectedData.ling) /
-                3) *
-              100
-            ).toFixed(1)}
-            %
-          </p>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Average of Medical Quality ({(selectedData.med1 * 100).toFixed(1)}
-            %), Semantic Similarity ({(selectedData.semantic * 100).toFixed(1)}
-            %), and Linguistic Quality ({(selectedData.ling * 100).toFixed(1)}%)
-          </p>
-        </div>
-      )}
+      {/* Removed the "Selected Dataset Final Score" card */}
 
-      {/* Updated bottom graphs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {allMetricsChart && (
           <ChartContainer title="Overall Performance Comparison">

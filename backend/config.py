@@ -4,9 +4,14 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
 INPUT_DATASET_PATH = "/Users/vrn/Work/medical_eval/backend/data/sample_15.csv"
-model_name = "c4ai-aya-expanse-32b"
+# model_name = "c4ai-aya-expanse-32b"
+# model_name = "command-a-03-2025"
+# model_name = "gpt-4o-mini-2024-07-18"
+# model_name = "gemini-2.5-flash"
+model_name = "Llama-3.3-70B-Instruct-Turbo"
 QUESTION_COLUMN = "Questions"
 JUDGE_MODEL = "gpt-4o-mini-2024-07-18"
+# JUDGE_MODEL = "gemini-2.5-flash"
 MAX_TOKENS = 1000
 TEMPERATURE = 0.1
 
