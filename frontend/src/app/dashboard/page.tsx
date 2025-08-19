@@ -1,162 +1,137 @@
 "use client";
 
-import { useDataSource } from "@/hooks/use-data-source";
-import MetricsCards from "@/components/charts/metrics-cards";
-import ChartContainer from "@/components/charts/chart-container";
-import BarChart from "@/components/charts/bar-chart";
-import PieChart from "@/components/charts/pie-chart";
-import {
-  createMetricCards,
-  createBarChartData,
-  createPieChartData,
-} from "@/lib/chart-utils";
-import { useMemo } from "react";
-import RowSelector from "@/components/ui/row-selector";
-import { useSelectedQuestion } from "@/hooks/use-selected-question";
+import { useEffect, useState } from "react";
+import Papa from "papaparse";
 
+// Define explicit types for metrics and headings
+type Metric = {
+  key: string;
+  displayName: string;
+  type?: never; // Ensures 'type' property doesn't exist on metrics
+};
 
+type Heading = {
+  type: "heading";
+  displayName: string;
+  key?: never; // Ensures 'key' property doesn't exist on headings
+};
+
+type Row = Record<string, string | number | null>;
+
+// Apply the new types to the config array
+const metricConfig: (Metric | Heading)[] = [
+  { type: "heading", displayName: "Semantic Similarity" },
+  { key: "sbert", displayName: "all-mpnet-base-v2" },
+  { key: "cohere", displayName: "Cohere" },
+  { key: "voyage", displayName: "Voyage" },
+  { key: "openai", displayName: "OpenAI" },
+  { key: "bert", displayName: "BERT Scores" },
+
+  { type: "heading", displayName: "Linguistic Scores" },
+  { key: "bleu", displayName: "BLEU" },
+  { key: "meteor", displayName: "METEOR" },
+  { key: "rouge_l", displayName: "ROUGE-L" },
+  { key: "perplexity", displayName: "Perplexity" },
+  { key: "ling", displayName: "Linguistic Scores" },
+
+  { type: "heading", displayName: "Medical Quality Scores" },
+  { key: "med1", displayName: "Medical 1" },
+  { key: "med2", displayName: "Medical 2" },
+];
 
 export default function HomePage() {
-  const { data: summaryData, loading: mainLoading } =
-    useDataSource("summary-scores");
+  const [data, setData] = useState<Record<string, Row[]>>({});
+  const [loading, setLoading] = useState(true);
 
+  const sources = {
+    "Cohere Aya-Expanse": "/c4ai-aya-expanse-32b/summary_scores.csv",
+    "Command-A": "/command-a-03-2025/summary_scores.csv",
+    "GPT-4o-mini": "/gpt-4o-mini-2024-07-18/summary_scores.csv",
+    "Llama-3.3-70B": "/Llama-3.3-70B-Instruct-Turbo/summary_scores.csv",
+  };
 
-  const medicalMetrics = useMemo(() => {
-    if (summaryData.length === 0) return [];
-    const rows = summaryData.filter((r) => typeof r.med1 === "number");
-    return createMetricCards(rows, ["med1", "med2"]);
-  }, [summaryData]);
+  useEffect(() => {
+    async function loadCSVs() {
+      setLoading(true);
+      const results: Record<string, Row[]> = {};
+      for (const [name, path] of Object.entries(sources)) {
+        const response = await fetch(path);
+        const text = await response.text();
+        const parsed = Papa.parse<Row>(text, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+        });
+        results[name] = parsed.data;
+      }
+      setData(results);
+      setLoading(false);
+    }
+    loadCSVs();
+  }, []);
 
-  const semanticMetrics = useMemo(() => {
-    if (summaryData.length === 0) return [];
-    const rows = summaryData.filter((r) => typeof r.med1 === "number");
-    // Changed: Removed "semantic" (aggregate) and added "openai"
-    return createMetricCards(rows, [
-      "sbert",
-      "cohere",
-      "voyage",
-      "openai",
-      "bert",
-    ]);
-  }, [summaryData]);
-
-  const linguisticMetrics = useMemo(() => {
-    if (summaryData.length === 0) return [];
-    const rows = summaryData.filter((r) => typeof r.med1 === "number");
-    return createMetricCards(rows, ["bleu", "meteor", "rouge_l", "perplexity"]);
-  }, [summaryData]);
-
-  const allMetricsChart = useMemo(() => {
-    if (summaryData.length === 0) return null;
-    const rows = summaryData.filter((r) => typeof r.med1 === "number");
-    return createBarChartData(rows, ["med1", "semantic", "ling"]);
-  }, [summaryData]);
-
-  const medicalDistribution = useMemo(() => {
-    if (summaryData.length === 0) return null;
-    const rows = summaryData.filter((r) => typeof r.med1 === "number");
-    return createPieChartData(rows, "med1");
-  }, [summaryData]);
-
-  const [selectedIndex] = useSelectedQuestion();
-  const selectedData =
-    selectedIndex !== null ? summaryData[selectedIndex] : null;
-
-  if (mainLoading) {
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center">
+        Loading...
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6 min-h-screen">
-      <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 p-6">
-        <h1 className="text-base md:text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-          Overview
+    <main className="min-h-screen w-full p-6 sm:p-12">
+      <div className="mx-auto max-w-10xl">
+        <h1 className="mb-20 text-center text-5xl font-bold">
+          Scores Across Models
         </h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          This page shows average scores across the entire dataset for medical
-          QA evaluation.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">
-              Medical Quality
-            </h3>
-            <p className="text-gray-700 dark:text-gray-400">
-              Measures accuracy, completeness, and medical correctness of
-              responses
-            </p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">
-              Semantic Similarity
-            </h3>
-            <p className="text-gray-700 dark:text-gray-400">
-              Evaluates how semantically similar the response is to the gold
-              standard using multiple embedding models
-            </p>
-          </div>
-          <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl border border-gray-200 dark:border-neutral-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-200 mb-1">
-              Linguistic Quality
-            </h3>
-            <p className="text-gray-700 dark:text-gray-400">
-              Assesses language fluency, grammar, and readability of responses
-            </p>
-          </div>
-        </div>
-      </div>
 
-      <RowSelector data={summaryData} questionField="dataset" />
-
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
-            Medical Quality Scores
-          </h2>
-          <MetricsCards metrics={medicalMetrics} />
-        </div>
-
-        <div>
-          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
-            Semantic Similarity Scores
-          </h2>
-          <MetricsCards metrics={semanticMetrics} />
-        </div>
-
-        <div>
-          <h2 className="text-xs md:text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
-            Linguistic Quality Scores
-          </h2>
-          <MetricsCards metrics={linguisticMetrics} />
-        </div>
-      </div>
-
-      {/* Removed the "Selected Dataset Final Score" card */}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {allMetricsChart && (
-          <ChartContainer title="Overall Performance Comparison">
-            <BarChart data={allMetricsChart} />
-          </ChartContainer>
-        )}
-
-        {medicalDistribution && (
-          <ChartContainer title="Medical Quality Score Distribution">
-            <p className="text-xs text-neutral-400 mb-2">
-              This chart shows the proportion of answers falling into different
-              medical quality score ranges (e.g., high, medium, low) across the
-              dataset.
-            </p>
-            <div className="w-full flex flex-col items-center">
-              <div className="max-w-md w-full h-60 mx-auto bg-white dark:bg-neutral-800 rounded-xl">
-                <PieChart data={medicalDistribution} />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {Object.entries(data).map(([model, rows]) => (
+            <div
+              key={model}
+              className="flex flex-col rounded-xl border border-neutral-800 bg-neutral-900/50 p-6 min-h-[420px]"
+            >
+              <h1 className="mb-6 text-xl font-semibold">{model}</h1>
+              <div className="flex flex-col gap-3 text-sm">
+                {metricConfig.map((metric, index) => {
+                  if (metric.type === "heading") {
+                    return (
+                      <div
+                        key={`heading-${index}`}
+                        className="pt-3 text-md font-semibold text-neutral-300"
+                      >
+                        {metric.displayName}
+                      </div>
+                    );
+                  } else {
+                    // This 'else' block fixes the error
+                    const value =
+                      rows.length > 0 ? rows[0][metric.key] : undefined;
+                    if (value !== undefined && value !== null) {
+                      return (
+                        <div
+                          key={metric.key}
+                          className="grid grid-cols-2 items-center gap-4"
+                        >
+                          <span className="text-neutral-400">
+                            {metric.displayName}
+                          </span>
+                          <span className="font-mono text-right">
+                            {typeof value === "number"
+                              ? value.toFixed(6)
+                              : String(value)}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }
+                })}
               </div>
             </div>
-          </ChartContainer>
-        )}
+          ))}
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
