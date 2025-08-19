@@ -12,20 +12,15 @@ export function getDataSourceById(
   const config = getDataSourceConfig();
   const source = config.dataSources.find((source) => source.id === id);
 
-  if (source && model) {
-    // Handle special cases like medical_3 which has a different structure
-    if (source.filePath.startsWith("/medical_3/")) {
-      // Keep medical_3 paths as is - they have their own subfolder structure
-      return source;
-    }
-
-    // Update the file path to use the selected model for regular model folders
+  if (source && model && source.filePath.includes("{{MODEL}}")) {
     return {
       ...source,
-      filePath: source.filePath.replace(/^\/[^\/]+\//, `/${model}/`),
+      filePath: source.filePath.replace("{{MODEL}}", model),
     };
   }
 
+  // If no model is provided or the path has no placeholder, return the original source.
+  // You might want to replace {{MODEL}} with a default model here if needed.
   return source;
 }
 

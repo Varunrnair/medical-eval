@@ -4,7 +4,7 @@
       "id": "scored-final-dataset",
       "name": "Medical QA Evaluation Results",
       "description": "Unified dataset with all metrics and both medical quality scores",
-      "filePath": "/c4ai-aya-expanse-32b/scored_final_dataset.csv",
+      "filePath": "{{MODEL}}/scored_final_dataset.csv",
       "schema": {
         "Theme": "string",
         "Questions": "string",
@@ -44,7 +44,7 @@
       "id": "summary-scores",
       "name": "Average Scores by Dataset",
       "description": "One-row-per-dataset summary averages (appended/updated per run)",
-      "filePath": "/c4ai-aya-expanse-32b/summary_scores.csv",
+      "filePath": "{{MODEL}}/summary_scores.csv",
       "schema": {
         "dataset": "string",
         "rows": "number",
@@ -68,7 +68,7 @@
       "id": "medical-3-detailed",
       "name": "Medical 3 Detailed Scores",
       "description": "Detailed breakdown of medical 3 evaluation with rubric and theme scores",
-      "filePath": "/medical_3/command_a/scored_dataset_detailed.csv",
+      "filePath": "{{MODEL}}/command_a/scored_dataset_detailed.csv",
       "schema": {
         "index": "number",
         "Theme": "string",
