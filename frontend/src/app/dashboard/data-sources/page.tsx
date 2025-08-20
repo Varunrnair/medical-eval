@@ -22,7 +22,6 @@ export default function DataSourcesPage() {
       }
       setLoading(false)
     }
-
     loadDataSources()
   }, [])
 

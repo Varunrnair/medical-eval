@@ -37,8 +37,6 @@ const metricConfig: (Metric | Heading)[] = [
   { key: "medical_quality_score_2", displayName: "Medical 2" },
 ];
 
-
-
 export default function HomePage() {
   const [summaryData, setSummaryData] = useState<Record<string, Row[]>>({});
   const [detailedData, setDetailedData] = useState<Record<string, Row[]>>({});
@@ -46,6 +44,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [selectedIndex, setSelectedIndex] = useSelectedQuestion();
 
+  const dataset = "sakhi"; // 👈 just change this variable to load another dataset
   const models = {
     "Cohere Aya-Expanse": "/c4ai-aya-expanse-32b",
     "Command-A": "/command-a-03-2025",
@@ -54,7 +53,6 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    // This map helps rename the old summary keys to the new detailed keys
     const summaryKeyMap: { [oldKey: string]: string } = {
       sbert: "sbert_similarity",
       cohere: "cohere_similarity",
@@ -76,8 +74,10 @@ export default function HomePage() {
       let questionList: string[] = [];
 
       for (const [name, basePath] of Object.entries(models)) {
-        // Fetch and normalize summary data
-        const summaryResponse = await fetch(`sakhi/${basePath}/summary_scores.csv`);
+        // ✅ updated path
+        const summaryResponse = await fetch(
+          `/datasets/${dataset}${basePath}/summary_scores.csv`
+        );
         const summaryText = await summaryResponse.text();
         const parsedSummary = Papa.parse<Row>(summaryText, {
           header: true,
@@ -95,9 +95,10 @@ export default function HomePage() {
         });
         summaryResults[name] = normalizedSummaryData;
 
-
-        // Fetch detailed data
-        const detailedResponse = await fetch(`sakhi/${basePath}/scored_final_dataset.csv`);
+        // ✅ updated path
+        const detailedResponse = await fetch(
+          `/datasets/${dataset}${basePath}/scored_final_dataset.csv`
+        );
         const detailedText = await detailedResponse.text();
         const detailedParsed = Papa.parse<Row>(detailedText, {
           header: true,
@@ -105,7 +106,7 @@ export default function HomePage() {
           skipEmptyLines: true,
         });
         detailedResults[name] = detailedParsed.data;
-        
+
         if (questionList.length === 0 && detailedParsed.data.length > 0) {
           questionList = detailedParsed.data.map(
             (row) => String(row.Questions || "")

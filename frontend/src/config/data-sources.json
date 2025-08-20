@@ -4,7 +4,7 @@
       "id": "scored-final-dataset",
       "name": "Medical QA Evaluation Results",
       "description": "Unified dataset with all metrics and both medical quality scores",
-      "filePath": "sakhi/{{MODEL}}/scored_final_dataset.csv",
+      "filePath": "datasets/{{DATASET}}/{{MODEL}}/scored_final_dataset.csv",
       "schema": {
         "Theme": "string",
         "Questions": "string",
@@ -44,7 +44,7 @@
       "id": "summary-scores",
       "name": "Average Scores by Dataset",
       "description": "One-row-per-dataset summary averages (appended/updated per run)",
-      "filePath": "sakhi/{{MODEL}}/summary_scores.csv",
+      "filePath": "datasets/{{DATASET}}/{{MODEL}}/summary_scores.csv",
       "schema": {
         "dataset": "string",
         "rows": "number",

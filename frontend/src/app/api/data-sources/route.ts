@@ -1,14 +1,15 @@
-import { NextResponse } from "next/server"
-import { getAllDataSources } from "@/lib/data-config"
+// app/api/data-sources/route.ts
+import { NextResponse } from "next/server";
+import { getAllDatasets } from "@/lib/data-config";
 
 
 
 export async function GET() {
   try {
-    const dataSources = getAllDataSources()
-    return NextResponse.json({ sources: dataSources })
+    const datasets = getAllDatasets();
+    return NextResponse.json({ datasets });
   } catch (error) {
-    console.error("Error fetching data sources:", error)
-    return NextResponse.json({ error: "Failed to fetch data sources" }, { status: 500 })
+    console.error("Error fetching datasets:", error);
+    return NextResponse.json({ error: "Failed to fetch datasets" }, { status: 500 });
   }
 }
