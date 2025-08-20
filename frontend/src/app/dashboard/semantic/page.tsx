@@ -11,11 +11,12 @@ import { createBarChartData, createRadarChartData } from "@/lib/chart-utils";
 import { useMemo, useState } from "react";
 import Modal from "@/components/ui/modal";
 
+
+
 export default function SemanticAnalysisPage() {
   const { data, loading, error } = useDataSource("scored-final-dataset");
   const [selectedIndex] = useSelectedQuestion();
   const [barModalOpen, setBarModalOpen] = useState(false);
-
   const semanticMetricsBar = useMemo(() => {
     if (data.length === 0) return null;
     return createBarChartData(data, [

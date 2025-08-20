@@ -1,12 +1,13 @@
 "use client"
 
 import type { DataSource } from "@/types/data"
-
 interface DataSourceCardProps {
   dataSource: DataSource
   onSelect: (id: string) => void
   isSelected?: boolean
 }
+
+
 
 export default function DataSourceCard({ dataSource, onSelect, isSelected = false }: DataSourceCardProps) {
   return (

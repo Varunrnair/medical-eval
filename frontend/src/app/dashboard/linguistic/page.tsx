@@ -13,6 +13,8 @@ import { useMemo } from "react"
 import Modal from "@/components/ui/modal";
 import { useState } from "react";
 
+
+
 export default function LinguisticAnalysisPage() {
   const { data, loading, error } = useDataSource("scored-final-dataset")
   const [selectedIndex] = useSelectedQuestion()
@@ -75,7 +77,6 @@ export default function LinguisticAnalysisPage() {
     ]
     return { labels, datasets }
   }, [data])
-
 
 
   const selectedData = selectedIndex !== null ? data[selectedIndex] : null

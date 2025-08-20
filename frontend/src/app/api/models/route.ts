@@ -2,14 +2,12 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
+
+
 export async function GET() {
   try {
-    const publicDir = path.join(process.cwd(), "public");
-
-    // Read all directories in the public folder
+    const publicDir = path.join(process.cwd(), "public/sakhi/");
     const entries = fs.readdirSync(publicDir, { withFileTypes: true });
-
-    // Filter for directories only, excluding common web assets and special folders
     const modelFolders = entries
       .filter(
         (entry) =>
@@ -21,7 +19,6 @@ export async function GET() {
       )
       .map((entry) => entry.name)
       .sort();
-
     return NextResponse.json(modelFolders);
   } catch (error) {
     console.error("Error reading model directories:", error);

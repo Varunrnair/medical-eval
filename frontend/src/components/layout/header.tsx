@@ -8,6 +8,8 @@ import { navigation } from "@/config/navigation";
 import Image from "next/image";
 import { useModel } from "@/contexts/ModelContext";
 
+
+
 const METRIC_SECTIONS = [
   {
     title: "Medical Metrics",

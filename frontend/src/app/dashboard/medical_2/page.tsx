@@ -17,6 +17,8 @@ import { useState } from "react"
 import type { MedicalQualityDetailed } from "@/types/data";
 import Modal from "@/components/ui/modal";
 
+
+
 export default function Medical2AnalysisPage() {
   // Use unified dataset
   const { data, loading, error } = useDataSource("scored-final-dataset") as { data: any[], loading: boolean, error: string | null }

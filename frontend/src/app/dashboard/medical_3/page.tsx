@@ -11,7 +11,8 @@ import { useMemo, useState, useEffect } from "react"
 import type { MedicalQualityDetailed } from "@/types/data";
 import Modal from "@/components/ui/modal";
 
-// Helper to fetch gold standard answers by question
+
+
 async function fetchGoldStandardAnswers() {
   const res = await fetch("/medical_3/scored_dataset_updated.csv");
   const text = await res.text();

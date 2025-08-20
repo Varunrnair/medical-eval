@@ -8,6 +8,8 @@ import ThemeToggle from "@/components/ui/theme-toggle";
 
 const inter = Inter({ subsets: ["latin"] });
 
+
+
 export const metadata: Metadata = {
   title: "Medical QA Dashboard",
   description: "Medical QA evaluation results dashboard",

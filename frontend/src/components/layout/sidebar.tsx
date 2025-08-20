@@ -8,6 +8,8 @@ import { useModel } from "@/contexts/ModelContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import Dropdown from "@/components/ui/dropdown";
 
+
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { selectedModel, availableModels, setSelectedModel, isLoading } =

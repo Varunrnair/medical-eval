@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { fetchCsvData } from "@/lib/api";
 import { useModel } from "@/contexts/ModelContext";
 
+
+
 export function useDataSource(sourceId: string | null) {
   const [data, setData] = useState<any[]>([]);
   const [columns, setColumns] = useState<string[]>([]);
@@ -21,7 +23,6 @@ export function useDataSource(sourceId: string | null) {
     const loadData = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const response = await fetchCsvData(sourceId, selectedModel);
         if (response.success) {
@@ -36,7 +37,6 @@ export function useDataSource(sourceId: string | null) {
         setLoading(false);
       }
     };
-
     loadData();
   }, [sourceId, selectedModel]);
 

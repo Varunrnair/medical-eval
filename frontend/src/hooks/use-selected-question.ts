@@ -5,6 +5,8 @@ import { useState, useEffect } from "react"
 let globalSelectedIndex: number | null = null
 let listeners: ((index: number | null) => void)[] = []
 
+
+
 export function useSelectedQuestion() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(globalSelectedIndex)
 

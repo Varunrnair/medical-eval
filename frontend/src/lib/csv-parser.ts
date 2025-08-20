@@ -2,12 +2,14 @@ import Papa from "papaparse"
 import fs from "fs"
 import path from "path"
 
+
+
 export async function parseCsvFromPath(filePath: string): Promise<any[]> {
   try {
     // Construct the full path relative to the public directory
-    // filePath will be something like "/data/scored_final_dataset.csv"
-    const fullPath = path.join(process.cwd(), "public", filePath)
-
+    // filePath will be something like "/command-a-03-2025/data/scored_final_dataset.csv"
+    const fullPath = path.join(process.cwd(), "public/sakhi", filePath)
+    
     // Check if file exists
     if (!fs.existsSync(fullPath)) {
       throw new Error(`File not found: ${fullPath}`)

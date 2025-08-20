@@ -14,13 +14,14 @@ import { useState } from "react"
 import type { MedicalQualityDetailed } from "@/types/data";
 import Modal from "@/components/ui/modal";
 
+
+
 export default function MedicalAnalysisPage() {
   const { data, loading, error } = useDataSource("scored-final-dataset") as { data: any[], loading: boolean, error: string | null }
   const [selectedIndex] = useSelectedQuestion()
   const [barModalOpen, setBarModalOpen] = useState(false);
   const [stackedBarModalOpen, setStackedBarModalOpen] = useState(false);
   const [trendLineModalOpen, setTrendLineModalOpen] = useState(false);
-
 
   const selectedData = useMemo(() => {
     if (selectedIndex === null || !data[selectedIndex]) return null

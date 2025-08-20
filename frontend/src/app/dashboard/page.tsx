@@ -17,7 +17,6 @@ type Heading = {
 };
 type Row = Record<string, string | number | null>;
 
-// This config is correct for your detailed_score.csv and will now work for summary too.
 const metricConfig: (Metric | Heading)[] = [
   { type: "heading", displayName: "Semantic Similarity" },
   { key: "sbert_similarity", displayName: "all-mpnet-base-v2" },
@@ -37,6 +36,8 @@ const metricConfig: (Metric | Heading)[] = [
   { key: "medical_quality_score", displayName: "Medical 1" },
   { key: "medical_quality_score_2", displayName: "Medical 2" },
 ];
+
+
 
 export default function HomePage() {
   const [summaryData, setSummaryData] = useState<Record<string, Row[]>>({});
@@ -76,7 +77,7 @@ export default function HomePage() {
 
       for (const [name, basePath] of Object.entries(models)) {
         // Fetch and normalize summary data
-        const summaryResponse = await fetch(`${basePath}/summary_scores.csv`);
+        const summaryResponse = await fetch(`sakhi/${basePath}/summary_scores.csv`);
         const summaryText = await summaryResponse.text();
         const parsedSummary = Papa.parse<Row>(summaryText, {
           header: true,
@@ -84,7 +85,6 @@ export default function HomePage() {
           skipEmptyLines: true,
         });
 
-        // ✅ NORMALIZATION STEP: Rename summary keys to match detailed keys
         const normalizedSummaryData = parsedSummary.data.map((summaryRow) => {
           const newRow: Row = {};
           for (const [key, value] of Object.entries(summaryRow)) {
@@ -97,7 +97,7 @@ export default function HomePage() {
 
 
         // Fetch detailed data
-        const detailedResponse = await fetch(`${basePath}/scored_final_dataset.csv`);
+        const detailedResponse = await fetch(`sakhi/${basePath}/scored_final_dataset.csv`);
         const detailedText = await detailedResponse.text();
         const detailedParsed = Papa.parse<Row>(detailedText, {
           header: true,
@@ -154,7 +154,7 @@ export default function HomePage() {
               id="question-select"
               value={selectedIndex === null ? "all" : selectedIndex}
               onChange={handleQuestionChange}
-              className="w-full max-w-lg cursor-pointer rounded-md border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full max-w-lg cursor-pointer rounded-full border border-neutral-700 bg-neutral-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Questions (Summary)</option>
               {questions.map((question, index) => (

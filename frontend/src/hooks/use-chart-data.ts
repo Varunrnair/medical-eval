@@ -3,6 +3,8 @@
 import { useMemo } from "react"
 import { createPieChartData, createBarChartData, createRadarChartData, createMetricCards } from "@/lib/chart-utils"
 
+
+
 export function useChartData(data: any[], columns: string[]) {
   const numericColumns = useMemo(() => {
     if (data.length === 0) return []

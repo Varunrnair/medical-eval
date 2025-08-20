@@ -6,6 +6,8 @@ import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 
+
+
 export default function LayoutWithSidebar({
   children,
 }: {

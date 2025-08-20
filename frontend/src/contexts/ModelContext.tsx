@@ -1,13 +1,14 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-
 interface ModelContextType {
   selectedModel: string;
   availableModels: string[];
   setSelectedModel: (model: string) => void;
   isLoading: boolean;
 }
+
+
 
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
 
