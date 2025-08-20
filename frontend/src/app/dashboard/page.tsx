@@ -121,7 +121,6 @@ export default function HomePage() {
     loadCSVs();
   }, []);
 
-  // ... (the rest of the component's JSX remains exactly the same) ...
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedIndex(value === "all" ? null : parseInt(value, 10));
@@ -177,17 +176,8 @@ export default function HomePage() {
                 : detailedRows[selectedIndex];
 
             if (!currentRow) {
-              return (
-                 <div
-                  key={model}
-                  className="flex flex-col rounded-xl border border-neutral-800 bg-neutral-900/50 p-6 min-h-[420px]"
-                >
-                  <h1 className="mb-6 text-xl font-semibold">{model}</h1>
-                  <p className="text-neutral-400">Data not available for this selection.</p>
-                </div>
-              );
+              return null;
             }
-
             return (
               <div
                 key={model}

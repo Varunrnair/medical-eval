@@ -16,8 +16,8 @@ MAX_TOKENS = 1000
 TEMPERATURE = 0.1
 
 
-FINAL_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/{model_name}/scored_final_dataset.csv"
-SUMMARY_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/{model_name}/summary_scores.csv"
+FINAL_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/sakhi/{model_name}/scored_final_dataset.csv"
+SUMMARY_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/sakhi/{model_name}/summary_scores.csv"
 LLM_RESPONSES_OUTPUT_PATH = FINAL_DATASET_PATH
 LINGUISTIC_SCORED_DATASET_PATH = FINAL_DATASET_PATH
 SEMANTIC_SCORED_DATASET_PATH = FINAL_DATASET_PATH
