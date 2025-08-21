@@ -11,8 +11,6 @@ import { createBarChartData, createRadarChartData } from "@/lib/chart-utils";
 import { useMemo, useState } from "react";
 import Modal from "@/components/ui/modal";
 
-
-
 export default function SemanticAnalysisPage() {
   const { data, loading, error } = useDataSource("scored-final-dataset");
   const [selectedIndex] = useSelectedQuestion();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 import { useSelectedQuestion } from "../../hooks/use-selected-question";
+import { useModel } from "@/contexts/ModelContext"; // ✅ use dataset from context
 
 // Define explicit types for metrics and headings
 type Metric = {
@@ -42,9 +43,11 @@ export default function HomePage() {
   const [detailedData, setDetailedData] = useState<Record<string, Row[]>>({});
   const [questions, setQuestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>(""); // ✅ error handling
   const [selectedIndex, setSelectedIndex] = useSelectedQuestion();
 
-  const dataset = "sakhi"; // 👈 just change this variable to load another dataset
+  const { selectedDataset } = useModel(); // ✅ now dynamic
+
   const models = {
     "Cohere Aya-Expanse": "/c4ai-aya-expanse-32b",
     "Command-A": "/command-a-03-2025",
@@ -53,6 +56,8 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    if (!selectedDataset) return;
+
     const summaryKeyMap: { [oldKey: string]: string } = {
       sbert: "sbert_similarity",
       cohere: "cohere_similarity",
@@ -69,58 +74,92 @@ export default function HomePage() {
 
     async function loadCSVs() {
       setLoading(true);
+      setError("");
       const summaryResults: Record<string, Row[]> = {};
       const detailedResults: Record<string, Row[]> = {};
       let questionList: string[] = [];
 
-      for (const [name, basePath] of Object.entries(models)) {
-        // ✅ updated path
-        const summaryResponse = await fetch(
-          `/datasets/${dataset}${basePath}/summary_scores.csv`
-        );
-        const summaryText = await summaryResponse.text();
-        const parsedSummary = Papa.parse<Row>(summaryText, {
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true,
-        });
-
-        const normalizedSummaryData = parsedSummary.data.map((summaryRow) => {
-          const newRow: Row = {};
-          for (const [key, value] of Object.entries(summaryRow)) {
-            const newKey = summaryKeyMap[key] || key;
-            newRow[newKey] = value;
-          }
-          return newRow;
-        });
-        summaryResults[name] = normalizedSummaryData;
-
-        // ✅ updated path
-        const detailedResponse = await fetch(
-          `/datasets/${dataset}${basePath}/scored_final_dataset.csv`
-        );
-        const detailedText = await detailedResponse.text();
-        const detailedParsed = Papa.parse<Row>(detailedText, {
-          header: true,
-          dynamicTyping: true,
-          skipEmptyLines: true,
-        });
-        detailedResults[name] = detailedParsed.data;
-
-        if (questionList.length === 0 && detailedParsed.data.length > 0) {
-          questionList = detailedParsed.data.map(
-            (row) => String(row.Questions || "")
+      try {
+        for (const [name, basePath] of Object.entries(models)) {
+          // ✅ updated path
+          const summaryResponse = await fetch(
+            `/datasets/${selectedDataset}${basePath}/summary_scores.csv`
           );
-        }
-      }
 
-      setSummaryData(summaryResults);
-      setDetailedData(detailedResults);
-      setQuestions(questionList);
-      setLoading(false);
+          if (!summaryResponse.ok) {
+            setError(`No dataset found in "${selectedDataset}". Please pick a valid dataset.`);
+            setLoading(false);
+            return;
+          }
+
+          const summaryText = await summaryResponse.text();
+          if (!summaryText.trim()) {
+            setError(`"${selectedDataset}" dataset is empty. Please pick a valid dataset.`);
+            setLoading(false);
+            return;
+          }
+
+          const parsedSummary = Papa.parse<Row>(summaryText, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+          });
+
+          const normalizedSummaryData = parsedSummary.data.map((summaryRow) => {
+            const newRow: Row = {};
+            for (const [key, value] of Object.entries(summaryRow)) {
+              const newKey = summaryKeyMap[key] || key;
+              newRow[newKey] = value;
+            }
+            return newRow;
+          });
+          summaryResults[name] = normalizedSummaryData;
+
+          // ✅ updated path
+          const detailedResponse = await fetch(
+            `/datasets/${selectedDataset}${basePath}/scored_final_dataset.csv`
+          );
+
+          if (!detailedResponse.ok) {
+            setError(`No dataset found in "${selectedDataset}". Please pick a valid dataset.`);
+            setLoading(false);
+            return;
+          }
+
+          const detailedText = await detailedResponse.text();
+          if (!detailedText.trim()) {
+            setError(`"${selectedDataset}" dataset is empty. Please pick a valid dataset.`);
+            setLoading(false);
+            return;
+          }
+
+          const detailedParsed = Papa.parse<Row>(detailedText, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true,
+          });
+          detailedResults[name] = detailedParsed.data;
+
+          if (questionList.length === 0 && detailedParsed.data.length > 0) {
+            questionList = detailedParsed.data.map(
+              (row) => String(row.Questions || "")
+            );
+          }
+        }
+
+        setSummaryData(summaryResults);
+        setDetailedData(detailedResults);
+        setQuestions(questionList);
+      } catch (err) {
+        console.error("Error loading dataset:", err);
+        setError(`Failed to load "${selectedDataset}". Please pick a valid dataset.`);
+      } finally {
+        setLoading(false);
+      }
     }
+
     loadCSVs();
-  }, []);
+  }, [selectedDataset]);
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -131,6 +170,14 @@ export default function HomePage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-red-500">
+        {error}
       </div>
     );
   }
