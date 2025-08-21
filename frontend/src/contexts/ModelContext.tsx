@@ -4,11 +4,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface ModelContextType {
-  selectedDataset: string;
+  selectedDataset: string | null;
   availableDatasets: string[];
   setSelectedDataset: (dataset: string) => void;
 
-  selectedModel: string;
+  selectedModel: string | null;
   availableModels: string[];
   setSelectedModel: (model: string) => void;
 

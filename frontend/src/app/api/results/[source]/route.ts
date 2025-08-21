@@ -2,15 +2,25 @@ import { NextResponse } from "next/server";
 import { getDataSourceById } from "@/lib/data-config";
 import { parseCsvFromPath, getColumnNames } from "@/lib/csv-parser";
 
+
+
 export async function GET(
   request: Request,
-  { params }: { params: { source: string } },
+  { params }: { params: { sourceId: string } },
 ) {
   try {
     const { searchParams } = new URL(request.url);
     const model = searchParams.get("model");
+    const dataset = searchParams.get("dataset");
 
-    const sourceConfig = getDataSourceById(params.source, model || undefined);
+    if (!dataset) {
+        return NextResponse.json({ error: "Dataset parameter is missing" }, { status: 400 });
+    }
+     if (!model) {
+        return NextResponse.json({ error: "Model parameter is missing" }, { status: 400 });
+    }
+
+    const sourceConfig = getDataSourceById(params.sourceId, dataset, model);
 
     if (!sourceConfig) {
       return NextResponse.json(
@@ -19,7 +29,6 @@ export async function GET(
       );
     }
 
-    // Parse from model-specific dataset path
     const csvData = await parseCsvFromPath(sourceConfig.filePath);
     const columns = getColumnNames(csvData);
 
@@ -30,9 +39,10 @@ export async function GET(
       source: sourceConfig,
     });
   } catch (error) {
-    console.error("Error fetching CSV data:", error);
+    console.error(`Error fetching CSV data for source '${params.source}':`, error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to fetch CSV data";
     return NextResponse.json(
-      { error: "Failed to fetch CSV data" },
+      { error: errorMessage },
       { status: 500 },
     );
   }

@@ -3,21 +3,22 @@ import os
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
-INPUT_DATASET_PATH = "/Users/vrn/Work/medical_eval/backend/data/sample_15.csv"
+INPUT_DATASET_PATH = "/Users/vrn/Work/medical-eval/backend/data/history.csv"
 # model_name = "c4ai-aya-expanse-32b"
-# model_name = "command-a-03-2025"
+model_name = "command-a-03-2025"
 # model_name = "gpt-4o-mini-2024-07-18"
 # model_name = "gemini-2.5-flash"
-model_name = "Llama-3.3-70B-Instruct-Turbo"
+# model_name = "Llama-3.3-70B-Instruct-Turbo"
 QUESTION_COLUMN = "Questions"
 JUDGE_MODEL = "gpt-4o-mini-2024-07-18"
 # JUDGE_MODEL = "gemini-2.5-flash"
 MAX_TOKENS = 1000
 TEMPERATURE = 0.1
+dataset_name = "test2"
 
 
-FINAL_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/sakhi/{model_name}/scored_final_dataset.csv"
-SUMMARY_DATASET_PATH = f"/Users/vrn/Work/medical_eval/frontend/public/sakhi/{model_name}/summary_scores.csv"
+FINAL_DATASET_PATH = f"/Users/vrn/Work/medical-eval/frontend/public/datasets/{dataset_name}/{model_name}/scored_final_dataset.csv"
+SUMMARY_DATASET_PATH = f"/Users/vrn/Work/medical-eval/frontend/public/datasets/{dataset_name}/{model_name}/summary_scores.csv"
 LLM_RESPONSES_OUTPUT_PATH = FINAL_DATASET_PATH
 LINGUISTIC_SCORED_DATASET_PATH = FINAL_DATASET_PATH
 SEMANTIC_SCORED_DATASET_PATH = FINAL_DATASET_PATH

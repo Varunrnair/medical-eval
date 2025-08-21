@@ -158,10 +158,10 @@ class ThemeRubricScorer:
 
 if __name__ == "__main__":
     scorer = ThemeRubricScorer(
-        dataset_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/sample_15_themed.csv",
-        classified_rubric_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/theme_rubric_bank_classified.csv",
-        llm_response_source_csv="/Users/vrn/Work/medical_eval/frontend/public/command_a/llm_responses.csv",
-        output_dataset_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/command_a/scored_dataset_updated.csv",
-        detailed_output_csv="/Users/vrn/Work/medical_eval/frontend/public/medical_3/command_a/scored_dataset_detailed.csv"
+        dataset_csv="/Users/vrn/Work/medical-eval/frontend/public/medical_3/sample_15_themed.csv",
+        classified_rubric_csv="/Users/vrn/Work/medical-eval/frontend/public/medical_3/theme_rubric_bank_classified.csv",
+        llm_response_source_csv="/Users/vrn/Work/medical-eval/frontend/public/command_a/llm_responses.csv",
+        output_dataset_csv="/Users/vrn/Work/medical-eval/frontend/public/medical_3/command_a/scored_dataset_updated.csv",
+        detailed_output_csv="/Users/vrn/Work/medical-eval/frontend/public/medical_3/command_a/scored_dataset_detailed.csv"
     )
     scorer.run()

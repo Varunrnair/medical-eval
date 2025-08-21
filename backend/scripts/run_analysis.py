@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+import pandas as pd
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from config import (
     INPUT_DATASET_PATH,
@@ -122,9 +123,6 @@ def main() -> None:
 
     # After pipeline, compute and upsert summary averages (one row per dataset)
     try:
-        import pandas as pd
-        from pathlib import Path
-
         final_path = MEDICAL_2_SCORED_DATASET_PATH
         df = pd.read_csv(final_path)
 

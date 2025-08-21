@@ -1,8 +1,8 @@
 import pandas as pd
 import json
 import openai
-from google import genai
-from google.genai import types
+# from google import genai
+# from google.genai import types
 import os
 import re
 import time
@@ -46,7 +46,6 @@ class MedicalQualityEvaluator:
             "Communication": "Information is communicated clearly and effectively",
             "Terminology Accessibility": "Medical terms are explained accessibly for patients"
         }
-
 
 
     def call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> Optional[str]:

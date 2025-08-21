@@ -11,10 +11,10 @@ export function useDataSource(sourceId: string | null) {
   const [columns, setColumns] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { selectedModel } = useModel();
+  const { selectedModel, selectedDataset } = useModel();
 
   useEffect(() => {
-    if (!sourceId || !selectedModel) {
+    if (!sourceId || !selectedModel || !selectedDataset) {
       setData([]);
       setColumns([]);
       return;
@@ -24,21 +24,25 @@ export function useDataSource(sourceId: string | null) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetchCsvData(sourceId, selectedModel);
+        const response = await fetchCsvData(sourceId, selectedDataset, selectedModel);
         if (response.success) {
           setData(response.data.data);
           setColumns(response.data.columns);
         } else {
           setError(response.error || "Failed to load data");
+          setData([]);
+          setColumns([]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
+        setData([]);
+        setColumns([]);
       } finally {
         setLoading(false);
       }
     };
     loadData();
-  }, [sourceId, selectedModel]);
+  }, [sourceId, selectedModel, selectedDataset]);
 
   return { data, columns, loading, error };
 }

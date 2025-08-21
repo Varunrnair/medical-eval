@@ -86,18 +86,10 @@ export default function HomePage() {
             `/datasets/${selectedDataset}${basePath}/summary_scores.csv`
           );
 
-          if (!summaryResponse.ok) {
-            setError(`No dataset found in "${selectedDataset}". Please pick a valid dataset.`);
-            setLoading(false);
-            return;
-          }
+          if (!summaryResponse.ok) continue;
 
           const summaryText = await summaryResponse.text();
-          if (!summaryText.trim()) {
-            setError(`"${selectedDataset}" dataset is empty. Please pick a valid dataset.`);
-            setLoading(false);
-            return;
-          }
+          if (!summaryText.trim()) continue;
 
           const parsedSummary = Papa.parse<Row>(summaryText, {
             header: true,
@@ -120,18 +112,10 @@ export default function HomePage() {
             `/datasets/${selectedDataset}${basePath}/scored_final_dataset.csv`
           );
 
-          if (!detailedResponse.ok) {
-            setError(`No dataset found in "${selectedDataset}". Please pick a valid dataset.`);
-            setLoading(false);
-            return;
-          }
+          if (!detailedResponse.ok) continue;
 
           const detailedText = await detailedResponse.text();
-          if (!detailedText.trim()) {
-            setError(`"${selectedDataset}" dataset is empty. Please pick a valid dataset.`);
-            setLoading(false);
-            return;
-          }
+          if (!detailedText.trim()) continue;
 
           const detailedParsed = Papa.parse<Row>(detailedText, {
             header: true,
@@ -215,7 +199,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 justify-center">
           {Object.entries(summaryData).map(([model, summaryRows]) => {
             const detailedRows = detailedData[model] || [];
             const currentRow =

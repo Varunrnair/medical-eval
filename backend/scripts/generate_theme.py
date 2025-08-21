@@ -10,7 +10,7 @@ load_dotenv()
 
 
 
-INPUT_CSV = "/Users/vrn/Work/medical_eval/backend/data/sample_15.csv"
+INPUT_CSV = "/Users/vrn/Work/medical-eval/backend/data/sample_15.csv"
 OUTPUT_CSV = None
 THEMES: List[str] = [
     "symptom interpretation and triage",
