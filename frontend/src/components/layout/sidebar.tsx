@@ -22,7 +22,10 @@ export default function Sidebar() {
   } = useModel();
   const { isCollapsed, toggleSidebar } = useSidebar();
 
-  const datasetOptions = availableDatasets.map((d) => ({
+  const customOrder = ["sakhi", "usercontext1", "test1" ];
+  const datasetOptions = customOrder
+  .filter((d) => availableDatasets.includes(d))
+  .map((d) => ({
     value: d,
     label: d.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
   }));
