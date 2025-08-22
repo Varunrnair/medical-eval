@@ -6,7 +6,7 @@ import { parseCsvFromPath, getColumnNames } from "@/lib/csv-parser";
 
 export async function GET(
   request: Request,
-  { params }: { params: { sourceId: string } },
+  { params }: { params: { source: string } },
 ) {
   try {
     const { searchParams } = new URL(request.url);
@@ -14,13 +14,13 @@ export async function GET(
     const dataset = searchParams.get("dataset");
 
     if (!dataset) {
-        return NextResponse.json({ error: "Dataset parameter is missing" }, { status: 400 });
+      return NextResponse.json({ error: "Dataset parameter is missing" }, { status: 400 });
     }
-     if (!model) {
-        return NextResponse.json({ error: "Model parameter is missing" }, { status: 400 });
+    if (!model) {
+      return NextResponse.json({ error: "Model parameter is missing" }, { status: 400 });
     }
 
-    const sourceConfig = getDataSourceById(params.sourceId, dataset, model);
+    const sourceConfig = getDataSourceById(params.source, dataset, model);
 
     if (!sourceConfig) {
       return NextResponse.json(
@@ -41,9 +41,6 @@ export async function GET(
   } catch (error) {
     console.error(`Error fetching CSV data for source '${params.source}':`, error);
     const errorMessage = error instanceof Error ? error.message : "Failed to fetch CSV data";
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

@@ -4,13 +4,21 @@ import os
 import re
 import pandas as pd
 import cohere
-# from openai import OpenAI 
-# from together import Together
+from openai import OpenAI 
+from together import Together
 from pathlib import Path
 from dotenv import load_dotenv
 from langdetect import detect
 from typing import Optional
-from config import model_name 
+from config import model_name as DEFAULT_MODEL_NAME
+from prompts import *
+PROMPT_MAP = {
+    "sakhi": SAKHI_PROMPT,
+    "user_history1": USER_HISTORY1_PROMPT,
+    "user_history2": USER_HISTORY2_PROMPT,
+    "test1": TEST1_PROMPT,
+    "test2": TEST2_PROMPT
+}
 
 
 
@@ -30,90 +38,153 @@ class LanguageDetector:
             return "English"
 
 
+class PregnancyHealthLLM:
+    def __init__(self, api_key: str, model_name: str, prompt_type: str = "user_history1"):
+        self.model_name = model_name.lower()
+        self.prompt_type = prompt_type  
+
+        if "gpt" in self.model_name or "o1" in self.model_name:
+            self.provider = "openai"
+            self.client = OpenAI(api_key=api_key)
+        elif "c4ai-aya-expanse-32b" in self.model_name or "command-a-03-2025" in self.model_name:
+            self.provider = "cohere"
+            self.client = cohere.Client(api_key=api_key)
+        elif "llama" in self.model_name or "together" in self.model_name:
+            self.provider = "together"
+            self.client = Together(api_key=api_key)
+        else:
+            raise ValueError(f"Unsupported model name: {model_name}")
+        self.prompt_template = USER_HISTORY1_PROMPT
+
+
+    def generate_response(self, row: dict, detected_language: str) -> str:
+        if self.prompt_type == "test1":
+            prompt = self.prompt_template.format(
+                user_history=row.get("User History", "No history provided"),
+                question=row["Questions"],
+                detected_language=detected_language
+            )
+        elif self.prompt_type == "test2":
+            prompt = self.prompt_template.format(
+                condition=row.get("Condition", "Not specified"),
+                symptoms=row.get("Symptoms", "Not specified"),
+                past_medical_history=row.get("Past Medical History", "None"),
+                past_surgical_history=row.get("Past Surgical History", "None"),
+                past_social_history=row.get("Past Social History", "None"),
+                question=row["Questions"],
+                detected_language=detected_language
+            )
+        else:  
+            prompt = self.prompt_template.format(
+                question=row["Questions"],
+                detected_language=detected_language
+            )
+        
+        if self.provider == "openai":
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=150,
+                temperature=0.7
+            )
+            return response.choices[0].message.content.strip()
+
+        elif self.provider == "cohere":
+            response = self.client.chat(
+                model=self.model_name,
+                message=prompt,
+                max_tokens=150,
+                temperature=0.7
+            )
+            return response.text.strip()
+
+        elif self.provider == "together":
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=150,
+                temperature=0.7
+            )
+            if hasattr(response, "choices"):
+                return response.choices[0].message.content.strip()
+            elif hasattr(response, "text"):
+                return response.text.strip()
+            elif isinstance(response, dict) and "text" in response:
+                return response["text"].strip()
+            return str(response).strip()
+
+class PregnancyLLMResponder:
+    def __init__(self, model_name: Optional[str] = None, api_key: Optional[str] = None):
+        load_dotenv()
+        model_name = (model_name or DEFAULT_MODEL_NAME or "").lower()
+        if api_key:
+            chosen_key = api_key
+        elif "gpt" in model_name or "o1" in model_name:
+            chosen_key = os.getenv("OPENAI_API_KEY")
+        elif "c4ai-aya-expanse-32b" in model_name or "command-a-03-2025" in model_name or "cohere" in model_name:
+            chosen_key = os.getenv("COHERE_API_KEY")
+        elif "llama" in model_name or "together" in model_name:
+            chosen_key = os.getenv("TOGETHER_API_KEY")
+        else:
+            chosen_key = os.getenv("OPENAI_API_KEY") or os.getenv("COHERE_API_KEY") or os.getenv("TOGETHER_API_KEY")
+        if not chosen_key:
+            raise ValueError("No valid API key found in environment variables for the requested model.")
+        self.llm = PregnancyHealthLLM(chosen_key, model_name)
+        self.detector = LanguageDetector()
+
+    def generate_llm_responses(self, csv_path: str, output_path: str, question_column: str = "Questions") -> pd.DataFrame:
+        df = pd.read_csv(csv_path)
+        if question_column not in df.columns:
+            raise ValueError(f"Column '{question_column}' not found in CSV.")
+        responses = []
+        for _, row in df.iterrows():
+            question = row[question_column]
+            lang = self.detector.detect_language(question)
+            response = self.llm.generate_response(row, lang)
+            responses.append(response)
+        df['llm_response'] = responses
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        df.to_csv(output_path, index=False)
+        return df
+
+
 
 # class PregnancyHealthLLM:
 #     def __init__(self, api_key: str):
-#         self.client = cohere.Client(api_key)
-#         # self.client = OpenAI(api_key=api_key)
+#         # self.client = cohere.Client(api_key)
+#         self.client = OpenAI(api_key=api_key)
 #         # self.client = Together(api_key=api_key)
-#         self.prompt_template = """You are a knowledgeable and caring assistant trained to support pregnancy-related health.  
-# Your task is to provide accurate, empathetic, and reliable answers to user questions specifically about pregnancy, prenatal care, and postnatal well-being.  
-
-# Instructions for Responding to User Questions:
-
-# 1. **Language and Style**  
-#    - You MUST answer strictly in {detected_language}.  
-#    - Do NOT translate, mix, or switch to any other language.  
-#    - Use the same script and style as the question. For example, if the question uses Hindi written in English letters, then answer in the same style.  
-#    - Use a warm, supportive, and informative tone. Avoid medical jargon. If any technical term is necessary, explain it in plain, easy-to-understand language.  
-
-# 2. **Scope and Content**  
-#    - Respond to questions related to women’s health, including but not limited to:  
-#      • Pregnancy, prenatal care, and postnatal well-being  
-#      • Reproductive health and contraception  
-#      • Sexual health and wellness  
-#      • Menstrual health and disorders  
-#      • Common gynecological conditions  
-#      • Nutrition, mental health, and general wellness unique to women  
-#    - For very short or unclear questions, assume a pregnancy-related intent and restate the implied question clearly before answering. Examples:  
-#      - "Food?" → "What kind of food should I eat during pregnancy?"  
-#      - "Exercise?" → "What kind of exercise is safe or recommended during pregnancy?"  
-#      - "Swelling feet" → "Is swelling in feet normal during pregnancy and what can I do about it?"  
-
-# 3. **Out-of-Scope Handling**  
-#    - If the question is clearly unrelated to women’s health, respond with this exact sentence:  
-#      "I can only answer questions related to women’s health. I cannot answer this question."  
-#    - Do NOT attempt to answer anything outside this scope.  
-
-# 4. **Answer Format**  
-#    - Provide a single-paragraph answer that is clear, concise, and around 60 to 80 words in length.  
-#    - Do NOT use bullet points or lists.  
-
-# 5. **Medical Disclaimer**  
-#    - Always recommend consulting a doctor for serious symptoms, diagnoses, or uncertainties.  
-
-# 6. **Patient Context** (use this information to tailor your response):  
-#    - Condition: {condition}  
-#    - Symptoms: {symptoms}  
-#    - Past Medical History: {past_medical_history}  
-#    - Past Surgical History: {past_surgical_history}  
-#    - Past Social History: {past_social_history}  
-
-# Question: {question}  
-# Answer:
-# """
+#         self.prompt_template = TEST2_PROMPT
 
 #     def generate_response(self, row: dict, detected_language: str) -> str:
 #         prompt = self.prompt_template.format(
-#             condition=row.get("Condition", "Not specified"),
-#             symptoms=row.get("Symptoms", "Not specified"),
-#             past_medical_history=row.get("Past Medical History", "None"),
-#             past_surgical_history=row.get("Past Surgical History", "None"),
-#             past_social_history=row.get("Past Social History", "None"),
+#             user_history=row.get("User History", "No history provided"),
 #             question=row["Questions"],
 #             detected_language=detected_language
 #         )
         
-#         # --- Cohere API call (commented out) ---
-#         response = self.client.chat(
-#             model=model_name,
-#             message=prompt,
-#             max_tokens=150,
-#             temperature=0.7
-#         )
-#         return response.text.strip()
-        
-#         # --- OpenAI API call (added) ---
-#         # response = self.client.chat.completions.create(
+#         # --- Cohere API call ---
+#         # response = self.client.chat(
 #         #     model=model_name,
-#         #     messages=[{"role": "user", "content": prompt}],
+#         #     message=prompt,
 #         #     max_tokens=150,
 #         #     temperature=0.7
 #         # )
-#         # return response.choices[0].message.content.strip()
+#         # return response.text.strip()
+        
+#         # --- OpenAI API call (added) ---
+#         response = self.client.chat.completions.create(
+#             model=model_name,
+#             messages=[{"role": "user", "content": prompt}],
+#             max_tokens=150,
+#             temperature=0.7
+#         )
+#         return response.choices[0].message.content.strip()
+
+#         # together api call
 #         # try:
 #         #     response = self.client.chat.completions.create(
-#         #         model="meta-llama/Llama-3.3-70B-Instruct-Turbo",                         
+#         #         model=model_name,                         
 #         #         messages=[
 #         #             {"role": "user", "content": prompt}
 #         #         ],
@@ -129,126 +200,3 @@ class LanguageDetector:
 #         # except Exception as e:
 #         #     # raise or return a helpful message — raising is better for batch processing to know failures
 #         #     raise RuntimeError(f"Together API request failed: {e}")
-
-
-
-class PregnancyHealthLLM:
-    def __init__(self, api_key: str):
-        self.client = cohere.Client(api_key)
-        # self.client = OpenAI(api_key=api_key)
-        # self.client = Together(api_key=api_key)
-        self.prompt_template = """You are a knowledgeable and caring assistant trained to support pregnancy-related health.  
-Your task is to provide accurate, empathetic, and reliable answers to user questions specifically about pregnancy, prenatal care, and postnatal well-being.  
-
-Instructions for Responding to User Questions:
-
-1. **Language and Style**  
-   - You MUST answer strictly in {detected_language}.  
-   - Do NOT translate, mix, or switch to any other language.  
-   - Use the same script and style as the question. For example, if the question uses Hindi written in English letters, then answer in the same style.  
-   - Use a warm, supportive, and informative tone. Avoid medical jargon. If any technical term is necessary, explain it in plain, easy-to-understand language.  
-
-2. **Scope and Content**  
-   - Respond to questions related to women’s health, including but not limited to:  
-     • Pregnancy, prenatal care, and postnatal well-being  
-     • Reproductive health and contraception  
-     • Sexual health and wellness  
-     • Menstrual health and disorders  
-     • Common gynecological conditions  
-     • Nutrition, mental health, and general wellness unique to women  
-   - For very short or unclear questions, assume a pregnancy-related intent and restate the implied question clearly before answering. Examples:  
-     - "Food?" → "What kind of food should I eat during pregnancy?"  
-     - "Exercise?" → "What kind of exercise is safe or recommended during pregnancy?"  
-     - "Swelling feet" → "Is swelling in feet normal during pregnancy and what can I do about it?"  
-
-3. **Out-of-Scope Handling**  
-   - If the question is clearly unrelated to women’s health, respond with this exact sentence:  
-     "I can only answer questions related to women’s health. I cannot answer this question."  
-   - Do NOT attempt to answer anything outside this scope.  
-
-4. **Answer Format**  
-   - Provide a single-paragraph answer that is clear, concise, and around 60 to 80 words in length.  
-   - Do NOT use bullet points or lists.  
-
-5. **Medical Disclaimer**  
-   - Always recommend consulting a doctor for serious symptoms, diagnoses, or uncertainties.  
-
-6. **Patient History Summary: {user_history} 
-
-Question: {question}  
-Answer:
-"""
-
-    def generate_response(self, row: dict, detected_language: str) -> str:
-        prompt = self.prompt_template.format(
-            user_history=row.get("User History", "No history provided"),
-            question=row["Questions"],
-            detected_language=detected_language
-        )
-        
-        # --- Cohere API call ---
-        response = self.client.chat(
-            model=model_name,
-            message=prompt,
-            max_tokens=150,
-            temperature=0.7
-        )
-        return response.text.strip()
-        
-        # --- OpenAI API call (added) ---
-        # response = self.client.chat.completions.create(
-        #     model=model_name,
-        #     messages=[{"role": "user", "content": prompt}],
-        #     max_tokens=150,
-        #     temperature=0.7
-        # )
-        # return response.choices[0].message.content.strip()
-        # try:
-        #     response = self.client.chat.completions.create(
-        #         model="meta-llama/Llama-3.3-70B-Instruct-Turbo",                         
-        #         messages=[
-        #             {"role": "user", "content": prompt}
-        #         ],
-        #         max_tokens=150,
-        #         temperature=0.7
-        #     )
-        #     # keep compatibility with OpenAI-like response shape
-        #     text = response.choices[0].message.content if hasattr(response, "choices") else getattr(response, "text", None)
-        #     if text is None:
-        #         # some Together SDKs return plain text in response['text']
-        #         text = response.get("text") if isinstance(response, dict) else str(response)
-        #     return text.strip()
-        # except Exception as e:
-        #     # raise or return a helpful message — raising is better for batch processing to know failures
-        #     raise RuntimeError(f"Together API request failed: {e}")
-
-
-
-class PregnancyLLMResponder:
-    def __init__(self, api_key: Optional[str] = None):
-        load_dotenv()
-        api_key = api_key or os.getenv('COHERE_API_KEY')
-        # api_key = api_key or os.getenv('TOGETHER_API_KEY')
-        # api_key = api_key or os.getenv('OPEN_API_KEY')
-        if not api_key:
-            # Updated error message
-            raise ValueError("COHERE_API_KEY not found in environment variables.")
-        self.llm = PregnancyHealthLLM(api_key)
-        self.detector = LanguageDetector()
-
-    def generate_llm_responses(self, csv_path: str, output_path: str, question_column: str = "Questions") -> pd.DataFrame:
-        df = pd.read_csv(csv_path)
-        if question_column not in df.columns:
-            raise ValueError(f"Column '{question_column}' not found in CSV.")
-
-        responses = []
-        for _, row in df.iterrows():
-            question = row[question_column]
-            lang = self.detector.detect_language(question)
-            response = self.llm.generate_response(row, lang)
-            responses.append(response)
-
-        df['llm_response'] = responses
-        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        df.to_csv(output_path, index=False)
-        return df

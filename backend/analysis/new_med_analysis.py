@@ -1,12 +1,12 @@
 import pandas as pd
 import json
 import os
-# import time
+import time
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
 from openai import OpenAI
-# from google import genai
-# from google.genai import types
+from google import genai
+from google.genai import types
 from config import JUDGE_MODEL
 load_dotenv()
 
@@ -112,13 +112,11 @@ class MedicalQualityEvaluator:
 
     #     for attempt in range(max_retries):
     #         try:
-    #             # Use the new SDK format
     #             response = self.client.models.generate_content(
-    #                 model=JUDGE_MODEL,  # Should be something like "gemini-2.5-flash"
+    #                 model=JUDGE_MODEL,  
     #                 contents=prompt,
     #                 config=generation_config
     #             )
-    #             # Check if response has content
     #             if response and response.text:
     #                 return response.text.strip()
     #             else:
@@ -129,7 +127,6 @@ class MedicalQualityEvaluator:
     #             if attempt == max_retries - 1:
     #                 print(f"LLM call failed after {max_retries} attempts: {e}")
     #                 return None
-                    
     #             wait_time = 2 ** (attempt + 1)
     #             print(f"Retrying in {wait_time} seconds...")
     #             time.sleep(wait_time)

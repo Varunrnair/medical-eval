@@ -1,8 +1,8 @@
 import pandas as pd
 import json
 import openai
-# from google import genai
-# from google.genai import types
+from google import genai
+from google.genai import types
 import os
 import re
 import time
@@ -67,6 +67,7 @@ class MedicalQualityEvaluator:
                 print(f"LLM call attempt {attempt + 1} failed, retrying...")
         return None
     
+
     # def call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> Optional[str]:
     #     """Call LLM with retry logic using the new Google GenAI SDK"""
     #     max_retries = 3

@@ -7,13 +7,13 @@ interface ModelContextType {
   selectedDataset: string | null;
   availableDatasets: string[];
   setSelectedDataset: (dataset: string) => void;
-
   selectedModel: string | null;
   availableModels: string[];
   setSelectedModel: (model: string) => void;
-
   isLoading: boolean;
 }
+
+
 
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
 

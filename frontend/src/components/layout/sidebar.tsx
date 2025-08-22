@@ -56,7 +56,7 @@ export default function Sidebar() {
           <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">Select Dataset</label>
           <Dropdown
             options={datasetOptions}
-            value={selectedDataset}
+            value={selectedDataset ?? ""}
             onChange={setSelectedDataset}
             placeholder="Loading datasets..."
             disabled={isLoading}
@@ -94,7 +94,7 @@ export default function Sidebar() {
           <label className="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-2">Select Model</label>
           <Dropdown
             options={modelOptions}
-            value={selectedModel}
+            value={selectedModel ?? ""}
             onChange={setSelectedModel}
             placeholder="Loading models..."
             disabled={isLoading}

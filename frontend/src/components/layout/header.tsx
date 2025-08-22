@@ -168,7 +168,7 @@ export default function Header() {
               <div className="text-sm md:text-base font-semibold text-gray-900 dark:text-white">
                 {getPageTitle(pathname)}
               </div>
-              {selectedModel && (
+              {selectedModel && pathname !== "/dashboard" && (
                 <div className="text-xs text-gray-500 dark:text-gray-400">
                   Model:{" "}
                   {selectedModel
