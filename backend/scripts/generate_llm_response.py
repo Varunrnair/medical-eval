@@ -40,16 +40,16 @@ class LanguageDetector:
 
 class PregnancyHealthLLM:
     def __init__(self, api_key: str, model_name: str, prompt_type: str = "user_history1"):
-        self.model_name = model_name.lower()
+        self.model_name = model_name  # keep original casing for API calls
         self.prompt_type = prompt_type  
-
-        if "gpt" in self.model_name or "o1" in self.model_name:
+        model_lower = model_name.lower()  # use only for detection
+        if "gpt" in model_lower or "o1" in model_lower:
             self.provider = "openai"
             self.client = OpenAI(api_key=api_key)
-        elif "c4ai-aya-expanse-32b" in self.model_name or "command-a-03-2025" in self.model_name:
+        elif "c4ai-aya-expanse-32b" in model_lower or "command-a-03-2025" in model_lower:
             self.provider = "cohere"
             self.client = cohere.Client(api_key=api_key)
-        elif "llama" in self.model_name or "together" in self.model_name:
+        elif "llama" in model_lower or "together" in model_lower:
             self.provider = "together"
             self.client = Together(api_key=api_key)
         else:
@@ -116,21 +116,24 @@ class PregnancyHealthLLM:
 class PregnancyLLMResponder:
     def __init__(self, model_name: Optional[str] = None, api_key: Optional[str] = None):
         load_dotenv()
-        model_name = (model_name or DEFAULT_MODEL_NAME or "").lower()
+        self.model_name = model_name or DEFAULT_MODEL_NAME or ""
+        model_name_lower = self.model_name.lower()
         if api_key:
             chosen_key = api_key
-        elif "gpt" in model_name or "o1" in model_name:
+        elif "gpt" in model_name_lower or "o1" in model_name_lower:
             chosen_key = os.getenv("OPENAI_API_KEY")
-        elif "c4ai-aya-expanse-32b" in model_name or "command-a-03-2025" in model_name or "cohere" in model_name:
+        elif "c4ai-aya-expanse-32b" in model_name_lower or "command-a-03-2025" in model_name_lower or "cohere" in model_name_lower:
             chosen_key = os.getenv("COHERE_API_KEY")
-        elif "llama" in model_name or "together" in model_name:
+        elif "llama" in model_name_lower or "together" in model_name_lower:
             chosen_key = os.getenv("TOGETHER_API_KEY")
         else:
-            chosen_key = os.getenv("OPENAI_API_KEY") or os.getenv("COHERE_API_KEY") or os.getenv("TOGETHER_API_KEY")
+            chosen_key = (
+                os.getenv("OPENAI_API_KEY") or os.getenv("COHERE_API_KEY") or os.getenv("TOGETHER_API_KEY") )
         if not chosen_key:
             raise ValueError("No valid API key found in environment variables for the requested model.")
         self.llm = PregnancyHealthLLM(chosen_key, model_name)
         self.detector = LanguageDetector()
+
 
     def generate_llm_responses(self, csv_path: str, output_path: str, question_column: str = "Questions") -> pd.DataFrame:
         df = pd.read_csv(csv_path)
