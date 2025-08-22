@@ -39,10 +39,12 @@ class LanguageDetector:
 
 
 class PregnancyHealthLLM:
-    def __init__(self, api_key: str, model_name: str, prompt_type: str = "user_history1"):
-        self.model_name = model_name  # keep original casing for API calls
-        self.prompt_type = prompt_type  
-        model_lower = model_name.lower()  # use only for detection
+    def __init__(self, api_key: str, model_name: str, prompt_type: str = "user_history2"):
+        if not model_name:
+            raise ValueError("model_name must be provided to initialize PregnancyHealthLLM.")
+        self.model_name = model_name
+        self.prompt_type = prompt_type
+        model_lower = model_name.lower()
         if "gpt" in model_lower or "o1" in model_lower:
             self.provider = "openai"
             self.client = OpenAI(api_key=api_key)
@@ -52,9 +54,13 @@ class PregnancyHealthLLM:
         elif "llama" in model_lower or "together" in model_lower:
             self.provider = "together"
             self.client = Together(api_key=api_key)
+            if not self.model_name.startswith("meta-llama/"):
+                self.together_model_name = f"meta-llama/{self.model_name}"
+            else:
+                self.together_model_name = self.model_name
         else:
             raise ValueError(f"Unsupported model name: {model_name}")
-        self.prompt_template = USER_HISTORY1_PROMPT
+        self.prompt_template = USER_HISTORY2_PROMPT
 
 
     def generate_response(self, row: dict, detected_language: str) -> str:
@@ -74,12 +80,12 @@ class PregnancyHealthLLM:
                 question=row["Questions"],
                 detected_language=detected_language
             )
-        else:  
+        else:
             prompt = self.prompt_template.format(
                 question=row["Questions"],
                 detected_language=detected_language
             )
-        
+
         if self.provider == "openai":
             response = self.client.chat.completions.create(
                 model=self.model_name,
@@ -100,7 +106,7 @@ class PregnancyHealthLLM:
 
         elif self.provider == "together":
             response = self.client.chat.completions.create(
-                model=self.model_name,
+                model=self.together_model_name,  
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=150,
                 temperature=0.7
@@ -113,11 +119,16 @@ class PregnancyHealthLLM:
                 return response["text"].strip()
             return str(response).strip()
 
+
 class PregnancyLLMResponder:
     def __init__(self, model_name: Optional[str] = None, api_key: Optional[str] = None):
         load_dotenv()
-        self.model_name = model_name or DEFAULT_MODEL_NAME or ""
+        self.model_name = (model_name or DEFAULT_MODEL_NAME)
+        if not self.model_name:
+            raise ValueError("No model_name provided and DEFAULT_MODEL_NAME is not set.")
         model_name_lower = self.model_name.lower()
+
+        # Select API key
         if api_key:
             chosen_key = api_key
         elif "gpt" in model_name_lower or "o1" in model_name_lower:
@@ -131,7 +142,7 @@ class PregnancyLLMResponder:
                 os.getenv("OPENAI_API_KEY") or os.getenv("COHERE_API_KEY") or os.getenv("TOGETHER_API_KEY") )
         if not chosen_key:
             raise ValueError("No valid API key found in environment variables for the requested model.")
-        self.llm = PregnancyHealthLLM(chosen_key, model_name)
+        self.llm = PregnancyHealthLLM(chosen_key, self.model_name)
         self.detector = LanguageDetector()
 
 
@@ -149,6 +160,7 @@ class PregnancyLLMResponder:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         df.to_csv(output_path, index=False)
         return df
+
 
 
 

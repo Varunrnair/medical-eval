@@ -14,7 +14,7 @@ JUDGE_MODEL = "gpt-4o-mini-2024-07-18"
 # JUDGE_MODEL = "gemini-2.5-flash"
 MAX_TOKENS = 1000
 TEMPERATURE = 0.1
-dataset_name = "usercontext1"
+dataset_name = "usercontext2"
 
 
 FINAL_DATASET_PATH = f"/Users/vrn/Work/medical-eval/frontend/public/datasets/{dataset_name}/{model_name}/scored_final_dataset.csv"
