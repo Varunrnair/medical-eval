@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 import { useSelectedQuestion } from "../../hooks/use-selected-question";
-import { useModel } from "@/contexts/ModelContext"; // ✅ use dataset from context
+import { useModel } from "@/contexts/ModelContext";
+import BarChart from "@/components/charts/bar-chart";
+import ChartContainer from "@/components/charts/chart-container";
 
-// Define explicit types for metrics and headings
+
 type Metric = {
   key: string;
   displayName: string;
@@ -18,6 +20,7 @@ type Heading = {
 };
 type Row = Record<string, string | number | null>;
 
+// Metric config
 const metricConfig: (Metric | Heading)[] = [
   { type: "heading", displayName: "Semantic Similarity" },
   { key: "sbert_similarity", displayName: "all-mpnet-base-v2" },
@@ -43,10 +46,10 @@ export default function HomePage() {
   const [detailedData, setDetailedData] = useState<Record<string, Row[]>>({});
   const [questions, setQuestions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>(""); // ✅ error handling
+  const [error, setError] = useState<string>("");
   const [selectedIndex, setSelectedIndex] = useSelectedQuestion();
 
-  const { selectedDataset } = useModel(); // ✅ now dynamic
+  const { selectedDataset } = useModel();
 
   const models = {
     "Cohere Aya-Expanse": "/c4ai-aya-expanse-32b",
@@ -81,11 +84,9 @@ export default function HomePage() {
 
       try {
         for (const [name, basePath] of Object.entries(models)) {
-          // ✅ updated path
           const summaryResponse = await fetch(
             `/datasets/${selectedDataset}${basePath}/summary_scores.csv`
           );
-
           if (!summaryResponse.ok) continue;
 
           const summaryText = await summaryResponse.text();
@@ -107,11 +108,9 @@ export default function HomePage() {
           });
           summaryResults[name] = normalizedSummaryData;
 
-          // ✅ updated path
           const detailedResponse = await fetch(
             `/datasets/${selectedDataset}${basePath}/scored_final_dataset.csv`
           );
-
           if (!detailedResponse.ok) continue;
 
           const detailedText = await detailedResponse.text();
@@ -168,7 +167,7 @@ export default function HomePage() {
     );
   }
 
-  // ✅ Compute per-metric min/max across models for the current view
+  // ✅ Compute min/max per metric
   const metricExtremes: Record<string, { min: number; max: number }> = {};
   metricConfig.forEach((metric) => {
     if ("key" in metric) {
@@ -176,7 +175,11 @@ export default function HomePage() {
       Object.values(summaryData).forEach((summaryRows, idx) => {
         const detailedRows = detailedData[Object.keys(summaryData)[idx]] || [];
         const row =
-          selectedIndex === null ? summaryRows[0] : detailedRows[selectedIndex];
+          selectedIndex === null
+            ? summaryRows[0]
+            : selectedIndex < detailedRows.length
+            ? detailedRows[selectedIndex]
+            : undefined;
         const val = row?.[metric.key];
         if (typeof val === "number") values.push(val);
       });
@@ -189,6 +192,38 @@ export default function HomePage() {
     }
   });
 
+  // ✅ Helper to get chart data per section
+  const getChartData = (section: string) => {
+    const startIndex = metricConfig.findIndex(
+      (m) => "type" in m && m.displayName === section
+    );
+    if (startIndex === -1) return null;
+
+    const sectionMetrics: Metric[] = [];
+    for (let i = startIndex + 1; i < metricConfig.length; i++) {
+      const m = metricConfig[i];
+      if ("type" in m) break;
+      sectionMetrics.push(m);
+    }
+
+    return {
+      labels: Object.keys(models),
+      datasets: sectionMetrics.map((metric, idx) => ({
+        label: metric.displayName,
+        data: Object.entries(summaryData).map(([model, rows]) => {
+          const row =
+            selectedIndex === null
+              ? rows[0]
+              : detailedData[model]?.[selectedIndex];
+          const value = (row?.[metric.key] as number) ?? 0;
+          // Ensure minimum value for log scale (avoid 0 or negative values)
+          return Math.max(value, 0.001);
+        }),
+        backgroundColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
+      })),
+    };
+  };
+
   return (
     <main className="min-h-screen w-full p-6 sm:p-12">
       <div className="mx-auto max-w-10xl">
@@ -196,6 +231,7 @@ export default function HomePage() {
           Scores Across Models
         </h1>
 
+        {/* Question Selector */}
         <div className="mb-12 flex justify-center">
           <div className="flex flex-col items-start gap-2">
             <label
@@ -222,17 +258,17 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Scorecards */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 justify-center">
           {Object.entries(summaryData).map(([model, summaryRows]) => {
             const detailedRows = detailedData[model] || [];
             const currentRow =
               selectedIndex === null
                 ? summaryRows[0]
-                : detailedRows[selectedIndex];
+                : detailedRows[selectedIndex] || undefined;
 
-            if (!currentRow) {
-              return null;
-            }
+            if (!currentRow) return null;
+
             return (
               <div
                 key={model}
@@ -285,6 +321,23 @@ export default function HomePage() {
                   })}
                 </div>
               </div>
+            );
+          })}
+        </div>
+
+        {/* Charts per Section with Log Scale */}
+        <div className="mt-16 space-y-12">
+          {[
+            "Semantic Similarity",
+            "Linguistic Scores",
+            "Medical Quality Scores",
+          ].map((section) => {
+            const data = getChartData(section);
+            if (!data) return null;
+            return (
+              <ChartContainer key={section} title={section}>
+                <BarChart data={data} useLogScale={true} />
+              </ChartContainer>
             );
           })}
         </div>
