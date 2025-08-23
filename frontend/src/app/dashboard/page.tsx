@@ -167,10 +167,10 @@ export default function HomePage() {
     );
   }
 
-  // ✅ Compute min/max per metric
   const metricExtremes: Record<string, { min: number; max: number }> = {};
   metricConfig.forEach((metric) => {
-    if ("key" in metric) {
+    if (metric.key) { 
+      const key = metric.key; 
       const values: number[] = [];
       Object.values(summaryData).forEach((summaryRows, idx) => {
         const detailedRows = detailedData[Object.keys(summaryData)[idx]] || [];
@@ -180,49 +180,17 @@ export default function HomePage() {
             : selectedIndex < detailedRows.length
             ? detailedRows[selectedIndex]
             : undefined;
-        const val = row?.[metric.key];
+        const val = row?.[key]; 
         if (typeof val === "number") values.push(val);
       });
       if (values.length > 0) {
-        metricExtremes[metric.key] = {
+        metricExtremes[key] = { 
           min: Math.min(...values),
           max: Math.max(...values),
         };
       }
     }
   });
-
-  // ✅ Helper to get chart data per section
-  const getChartData = (section: string) => {
-    const startIndex = metricConfig.findIndex(
-      (m) => "type" in m && m.displayName === section
-    );
-    if (startIndex === -1) return null;
-
-    const sectionMetrics: Metric[] = [];
-    for (let i = startIndex + 1; i < metricConfig.length; i++) {
-      const m = metricConfig[i];
-      if ("type" in m) break;
-      sectionMetrics.push(m);
-    }
-
-    return {
-      labels: Object.keys(models),
-      datasets: sectionMetrics.map((metric, idx) => ({
-        label: metric.displayName,
-        data: Object.entries(summaryData).map(([model, rows]) => {
-          const row =
-            selectedIndex === null
-              ? rows[0]
-              : detailedData[model]?.[selectedIndex];
-          const value = (row?.[metric.key] as number) ?? 0;
-          // Ensure minimum value for log scale (avoid 0 or negative values)
-          return Math.max(value, 0.001);
-        }),
-        backgroundColor: `hsl(${(idx * 60) % 360}, 70%, 50%)`,
-      })),
-    };
-  };
 
   return (
     <main className="min-h-screen w-full p-6 sm:p-12">
@@ -325,21 +293,87 @@ export default function HomePage() {
           })}
         </div>
 
-        {/* Charts per Section with Log Scale */}
-        <div className="mt-16 space-y-12">
-          {[
-            "Semantic Similarity",
-            "Linguistic Scores",
-            "Medical Quality Scores",
-          ].map((section) => {
-            const data = getChartData(section);
-            if (!data) return null;
-            return (
-              <ChartContainer key={section} title={section}>
-                <BarChart data={data} useLogScale={true} />
-              </ChartContainer>
+        {/* ------------------- GRAPHS SECTION (MODIFIED) ------------------- */}
+        <div className="mt-16">
+          {(() => {
+            // Define a consistent color palette for the models
+            const modelColors = Object.keys(models).map(
+              (_, idx) => `hsl(${(idx * 90) % 360}, 70%, 50%)`
             );
-          })}
+
+            // Define shared chart options for a more granular Y-axis
+            const chartOptions = {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  min: 0, // Set a fixed minimum for the Y-axis
+                  max: 1, // Set a fixed maximum for the Y-axis
+                },
+              },
+              plugins: {
+                legend: {
+                  display: false, // Hide legend as title is sufficient
+                },
+              },
+            };
+
+            const sections = metricConfig.filter(
+              (m) => m.type === "heading"
+            ) as Heading[];
+
+            return sections.map((section) => {
+              const startIndex = metricConfig.findIndex((m) => m === section);
+              const sectionMetrics: Metric[] = [];
+              for (let i = startIndex + 1; i < metricConfig.length; i++) {
+                const m = metricConfig[i];
+                if (m.type === "heading") break;
+                sectionMetrics.push(m as Metric);
+              }
+
+              return (
+                <div key={section.displayName} className="mt-12 first:mt-0">
+                  <h2 className="mb-8 text-3xl font-bold border-b border-neutral-700 pb-2">
+                    {section.displayName}
+                  </h2>
+                  {/* MODIFIED: Grid layout updated to make graphs smaller */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {sectionMetrics.map((metric) => {
+                      const chartData = {
+                        labels: Object.keys(models),
+                        datasets: [
+                          {
+                            label: metric.displayName,
+                            data: Object.entries(summaryData).map(
+                              ([model, rows]) => {
+                                const detailedRows = detailedData[model];
+                                const row =
+                                    selectedIndex != null && detailedRows && selectedIndex < detailedRows.length
+                                        ? detailedRows[selectedIndex]
+                                        : rows[0];
+                                const value = (row?.[metric.key] as number) ?? 0;
+                                return value;
+                              }
+                            ),
+                            backgroundColor: modelColors, // Assigns a different color per model
+                          },
+                        ],
+                      };
+
+                      return (
+                        <ChartContainer
+                          key={metric.key}
+                          title={metric.displayName}
+                        >
+                          {/* MODIFIED: Pass custom options for Y-axis scaling */}
+                          <BarChart data={chartData} options={chartOptions} />
+                        </ChartContainer>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            });
+          })()}
         </div>
       </div>
     </main>

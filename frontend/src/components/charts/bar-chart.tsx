@@ -1,14 +1,17 @@
 "use client"
 
 import { Bar } from "react-chartjs-2"
-import { Chart as ChartJS, CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend } from "chart.js"
+import { Chart as ChartJS, CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend, type ChartOptions,} from "chart.js"
 import type { ChartData } from "@/types/charts"
+
+
 
 ChartJS.register(CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend)
 
 interface BarChartProps {
-  data: ChartData
-  useLogScale?: boolean
+  data: ChartData;
+  useLogScale?: boolean;
+  options?: ChartOptions<"bar">; 
 }
 
 export default function BarChart({ data, useLogScale = false }: BarChartProps) {
