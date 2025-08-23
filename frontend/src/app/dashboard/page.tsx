@@ -136,7 +136,9 @@ export default function HomePage() {
         setQuestions(questionList);
       } catch (err) {
         console.error("Error loading dataset:", err);
-        setError(`Failed to load "${selectedDataset}". Please pick a valid dataset.`);
+        setError(
+          `Failed to load "${selectedDataset}". Please pick a valid dataset.`
+        );
       } finally {
         setLoading(false);
       }
@@ -165,6 +167,27 @@ export default function HomePage() {
       </div>
     );
   }
+
+  // ✅ Compute per-metric min/max across models for the current view
+  const metricExtremes: Record<string, { min: number; max: number }> = {};
+  metricConfig.forEach((metric) => {
+    if ("key" in metric) {
+      const values: number[] = [];
+      Object.values(summaryData).forEach((summaryRows, idx) => {
+        const detailedRows = detailedData[Object.keys(summaryData)[idx]] || [];
+        const row =
+          selectedIndex === null ? summaryRows[0] : detailedRows[selectedIndex];
+        const val = row?.[metric.key];
+        if (typeof val === "number") values.push(val);
+      });
+      if (values.length > 0) {
+        metricExtremes[metric.key] = {
+          min: Math.min(...values),
+          max: Math.max(...values),
+        };
+      }
+    }
+  });
 
   return (
     <main className="min-h-screen w-full p-6 sm:p-12">
@@ -230,6 +253,15 @@ export default function HomePage() {
                     } else {
                       const value = currentRow[metric.key];
                       if (value !== undefined && value !== null) {
+                        const extremes = metricExtremes[metric.key];
+                        const highlightClass =
+                          extremes && typeof value === "number"
+                            ? value === extremes.max
+                              ? "text-green-500 font-bold"
+                              : value === extremes.min
+                              ? "text-red-500 font-bold"
+                              : ""
+                            : "";
                         return (
                           <div
                             key={metric.key}
@@ -238,7 +270,9 @@ export default function HomePage() {
                             <span className="text-neutral-400">
                               {metric.displayName}
                             </span>
-                            <span className="font-mono text-right">
+                            <span
+                              className={`font-mono text-right ${highlightClass}`}
+                            >
                               {typeof value === "number"
                                 ? value.toFixed(6)
                                 : String(value)}

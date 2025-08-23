@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import os
+import re
 import time
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
@@ -14,9 +15,9 @@ load_dotenv()
 
 class MedicalQualityEvaluator:
     def __init__(self, dataset_path: str):
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        # api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
-        # self.client = genai.Client(api_key=api_key)
+        # self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        self.client = genai.Client(api_key=api_key)
         self.dataset_path = dataset_path
         
         if not os.path.exists(dataset_path):
@@ -28,7 +29,7 @@ class MedicalQualityEvaluator:
         if missing_columns:
             raise ValueError(f"Missing required columns: {missing_columns}")
         
-        # Define the 5 axes (3 fixed + 2 generated)
+
         self.selected_axes = [
             "Accuracy", 
             "Completeness",
@@ -75,62 +76,76 @@ class MedicalQualityEvaluator:
             ]
         }
         
-        # Axes that need rubric generation
         self.axes_to_generate = ["Accuracy", "Completeness"]
 
-
-    def call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> str:
-        """Call LLM with retry logic for better robustness"""
-        max_retries = 3
-        for attempt in range(max_retries):
+    @staticmethod
+    def safe_json_loads(response: str):
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            fixed = re.sub(r'"\s+"', '", "', response)  
             try:
-                response = self.client.chat.completions.create(
-                    model=JUDGE_MODEL,
-                    messages=[{"role": "user", "content": prompt}],
-                    max_tokens=max_tokens,
-                    temperature=temperature
-                )
-                return response.choices[0].message.content
-            except Exception as e:
-                if attempt == max_retries - 1:
-                    print(f"LLM call failed after {max_retries} attempts: {e}")
-                    return None
-                print(f"LLM call attempt {attempt + 1} failed, retrying...")
-        return None
+                return json.loads(fixed)
+            except Exception:
+                print("Failed to REPAIR JSON:", response)
+                return []
+        if isinstance(obj, list):
+            return {"unclassified": obj}
+        if not isinstance(obj, dict):
+            return {}
+        return obj
 
-    # def call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> Optional[str]:
-    #     """Call LLM with retry logic using the new Google GenAI SDK"""
+
+    # def call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> str:
+    #     """Call LLM with retry logic for better robustness"""
     #     max_retries = 3
-        
-    #     # Build the generation config
-    #     generation_config = types.GenerateContentConfig(
-    #         max_output_tokens=max_tokens,
-    #         temperature=temperature,
-    #         # Disable thinking to reduce costs and latency
-    #         thinking_config=types.ThinkingConfig(thinking_budget=0)
-    #     )
-
     #     for attempt in range(max_retries):
     #         try:
-    #             response = self.client.models.generate_content(
-    #                 model=JUDGE_MODEL,  
-    #                 contents=prompt,
-    #                 config=generation_config
+    #             response = self.client.chat.completions.create(
+    #                 model=JUDGE_MODEL,
+    #                 messages=[{"role": "user", "content": prompt}],
+    #                 max_tokens=max_tokens,
+    #                 temperature=temperature
     #             )
-    #             if response and response.text:
-    #                 return response.text.strip()
-    #             else:
-    #                 print(f"Empty response received on attempt {attempt + 1}")
-                    
+    #             return response.choices[0].message.content
     #         except Exception as e:
-    #             print(f"LLM call attempt {attempt + 1} failed: {str(e)}")
     #             if attempt == max_retries - 1:
     #                 print(f"LLM call failed after {max_retries} attempts: {e}")
     #                 return None
-    #             wait_time = 2 ** (attempt + 1)
-    #             print(f"Retrying in {wait_time} seconds...")
-    #             time.sleep(wait_time)
+    #             print(f"LLM call attempt {attempt + 1} failed, retrying...")
     #     return None
+
+    def call_llm(self, prompt: str, max_tokens: int = 800, temperature: float = 0.1) -> Optional[str]:
+        """Call LLM with retry logic using the new Google GenAI SDK"""
+        max_retries = 3
+        generation_config = types.GenerateContentConfig(
+            max_output_tokens=max_tokens,
+            temperature=temperature,
+            # Disable thinking to reduce costs and latency
+            thinking_config=types.ThinkingConfig(thinking_budget=0)
+        )
+
+        for attempt in range(max_retries):
+            try:
+                response = self.client.models.generate_content(
+                    model=JUDGE_MODEL,  
+                    contents=prompt,
+                    config=generation_config
+                )
+                if response and response.text:
+                    return response.text.strip()
+                else:
+                    print(f"Empty response received on attempt {attempt + 1}")
+                    
+            except Exception as e:
+                print(f"LLM call attempt {attempt + 1} failed: {str(e)}")
+                if attempt == max_retries - 1:
+                    print(f"LLM call failed after {max_retries} attempts: {e}")
+                    return None
+                wait_time = 2 ** (attempt + 1)
+                print(f"Retrying in {wait_time} seconds...")
+                time.sleep(wait_time)
+        return None
 
 
     def generate_rubrics_for_axes(self, question: str, gold_answer: str) -> List[str]:
@@ -178,7 +193,7 @@ JSON Response:"""
             json_end = response.rfind(']') + 1
             if json_start != -1 and json_end > json_start:
                 json_str = response[json_start:json_end]
-                rubrics = json.loads(json_str)
+                rubrics = self.safe_json_loads(json_str)
                 
                 # Validate that we got a list of strings
                 if isinstance(rubrics, list) and all(isinstance(r, str) for r in rubrics):
@@ -239,7 +254,7 @@ JSON Response:"""
             json_end = response.rfind('}') + 1
             if json_start != -1 and json_end > json_start:
                 json_str = response[json_start:json_end]
-                scores = json.loads(json_str)
+                scores = self.safe_json_loads(json_str)
                 
                 # Validate scores format
                 valid_scores = {}
@@ -312,7 +327,7 @@ JSON Response:"""
             json_end = response.rfind('}') + 1
             if json_start != -1 and json_end > json_start:
                 json_str = response[json_start:json_end]
-                classification = json.loads(json_str)
+                classification = self.safe_json_loads(json_str)
                 
                 # Validate and fix classification
                 final_classification = {}
