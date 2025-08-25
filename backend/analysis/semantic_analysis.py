@@ -5,11 +5,16 @@ from dotenv import load_dotenv
 from langdetect import detect
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from transformers import logging
+logging.set_verbosity_error()
 from bert_score import score as bert_score
 import cohere
 import voyageai
 from openai import OpenAI
 load_dotenv()
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
 
 
 
@@ -85,18 +90,17 @@ class SemanticAnalyzer:
         return self.labse
 
 
-    def compute_sbert_similarity(self, ref: str, resp: str) -> float:
-        if not ref or not resp:
-            return 0.0
-        try:
-            lang = self._detect_language(ref)
-            model = self._get_sbert_model(lang)
-            embeddings = model.encode([ref, resp])
-            similarity = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
-            return max(0.0, min(1.0, similarity))
-        except Exception as e:
-            print(f"Error in SBERT similarity: {e}")
-            return 0.0
+    def compute_all_sbert(self, refs: list[str], resps: list[str], lang: str) -> list[float]:
+        model = self._get_sbert_model(lang)
+        refs_emb = model.encode(refs, batch_size=32, show_progress_bar=False)   
+        resps_emb = model.encode(resps, batch_size=32, show_progress_bar=False) 
+        sims = []
+        for i in range(len(refs)):
+            sim = cosine_similarity([refs_emb[i]], [resps_emb[i]])[0][0]
+            if np.isnan(sim) or np.isinf(sim):
+                sim = 0.0
+            sims.append(max(0.0, min(1.0, sim)))
+        return sims
 
 
     def compute_vyakyarth_similarity(self, ref: str, resp: str) -> float:
@@ -106,6 +110,9 @@ class SemanticAnalyzer:
             model = self._get_vyakyarth_model()
             embeddings = model.encode([ref, resp])
             similarity = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+            # extra check to avoid NaN/inf values caused by zero or bad embeddings
+            if np.isnan(similarity) or np.isinf(similarity):
+                similarity = 0.0
             return max(0.0, min(1.0, similarity))
         except Exception as e:
             print(f"Error in Vyakyarth similarity: {e}")
@@ -121,10 +128,14 @@ class SemanticAnalyzer:
                 {"content": [{"type": "text", "text": ref}]},
                 {"content": [{"type": "text", "text": resp}]}
             ]
-            result = client.embed(inputs=inputs, model="embed-multilingual-v3.0", input_type="search_document", embedding_types=["float"])
+            result = client.embed(inputs=inputs, model="embed-multilingual-v3.0",
+                                input_type="search_document", embedding_types=["float"])
             emb1 = np.array(result.embeddings.float[0])
             emb2 = np.array(result.embeddings.float[1])
             similarity = cosine_similarity([emb1], [emb2])[0][0]
+            # extra check to avoid NaN/inf values caused by zero or bad embeddings
+            if np.isnan(similarity) or np.isinf(similarity):
+                similarity = 0.0
             return max(0.0, min(1.0, similarity))
         except Exception as e:
             print(f"Error in Cohere similarity: {e}")
@@ -140,6 +151,9 @@ class SemanticAnalyzer:
             emb1 = np.array(result.embeddings[0])
             emb2 = np.array(result.embeddings[1])
             similarity = cosine_similarity([emb1], [emb2])[0][0]
+            # extra check to avoid NaN/inf values caused by zero or bad embeddings
+            if np.isnan(similarity) or np.isinf(similarity):
+                similarity = 0.0
             return max(0.0, min(1.0, similarity))
         except Exception as e:
             print(f"Error in Voyage similarity: {e}")
@@ -154,6 +168,9 @@ class SemanticAnalyzer:
             emb1 = client.embeddings.create(input=ref, model="text-embedding-3-small").data[0].embedding
             emb2 = client.embeddings.create(input=resp, model="text-embedding-3-small").data[0].embedding
             similarity = cosine_similarity([emb1], [emb2])[0][0]
+            # extra check to avoid NaN/inf values caused by zero or bad embeddings
+            if np.isnan(similarity) or np.isinf(similarity):
+                similarity = 0.0
             return max(0.0, min(1.0, similarity))
         except Exception as e:
             print(f"Error in OpenAI similarity: {e}")
@@ -191,12 +208,11 @@ class SemanticAnalyzer:
             return 0.0
         try:
             lang = self._detect_language(reference)
-            P, R, F1 = bert_score([candidate], [reference], lang=lang, verbose=False)
+            P, R, F1 = bert_score([candidate], [reference], lang=lang, verbose=False, batch_size=16)
             return float(F1[0])
         except Exception as e:
             print(f"Error in BERTScore: {e}")
             return 0.0
-
 
     def run_and_update_scores(self):
         langs, sbert_sims, vyakyarth_sims = [], [], []
@@ -204,33 +220,51 @@ class SemanticAnalyzer:
         cohere_sims, voyage_sims = [], []
         openai_sims = []
         bert_scores, aggregated_sims = [], []
+        langs = [self._detect_language(ref) for ref in self.references]  
 
+        # --- SBERT batched by language ---
+        for lang in set(langs):  
+            idxs = [i for i, l in enumerate(langs) if l == lang]
+            refs = [self.references[i] for i in idxs]
+            resps = [self.responses[i] for i in idxs]
+            sims = self.compute_all_sbert(refs, resps, lang)
+            for j, idx in enumerate(idxs):
+                sbert_sims.insert(idx, sims[j])  # maintain row order
+
+        # --- Other models (row by row as before) ---
         for ref, resp in zip(self.references, self.responses):
-            lang = self._detect_language(ref)
-            langs.append(lang)
-
-            sbert = self.compute_sbert_similarity(ref, resp)
             # vyakyarth = self.compute_vyakyarth_similarity(ref, resp)
             # distiluse = self.compute_distiluse_similarity(ref, resp)
             # labse = self.compute_labse_similarity(ref, resp)
             cohere = self.compute_cohere_similarity(ref, resp)
             voyage = self.compute_voyage_similarity(ref, resp)
             openai = self.compute_openai_similarity(ref, resp)
-            bert = self.compute_bert_score(ref, resp)
+            # bert = self.compute_bert_score(ref, resp)  
 
             # Updated to only include active similarity methods (vyakyarth removed)
             # average_sim = (sbert + cohere + voyage + bert) / 4.0
 
-            sbert_sims.append(sbert)
+            # sbert_sims already handled above
             # vyakyarth_sims.append(vyakyarth)
             # distiluse_sims.append(distiluse)
             # labse_sims.append(labse)
             cohere_sims.append(cohere)
             voyage_sims.append(voyage)
             openai_sims.append(openai)
-            bert_scores.append(bert)
-            # aggregated_sims.append(average_sim)
+            # bert_scores.append(bert)  
 
+        # --- BERTScore batched once for all rows ---
+        try:
+            lang = "en" if all(l == "en" for l in langs) else "en"  # 🔹 simple fallback
+            P, R, F1 = bert_score(
+                self.responses, self.references, lang=lang, batch_size=16, verbose=False
+            )
+            bert_scores = [float(f) for f in F1]
+        except Exception as e:
+            print(f"Error in batched BERTScore: {e}")
+            bert_scores = [0.0] * len(self.references)
+
+        # --- Save results to dataframe ---
         self.df["language"] = langs
         self.df["sbert_similarity"] = sbert_sims
         # self.df["vyakyarth_similarity"] = vyakyarth_sims
@@ -241,7 +275,6 @@ class SemanticAnalyzer:
         self.df["openai_similarity"] = openai_sims
         self.df["bert_score_f1"] = bert_scores
         # self.df["semantic_similarity"] = aggregated_sims
-
         print("Semantic Similarity complete. Files ready for saving.")
 
 
@@ -262,3 +295,51 @@ class SemanticAnalyzer:
             # "avg_semantic_similarity": np.mean(self.df["semantic_similarity"]),
         }
         pd.DataFrame([summary]).to_csv(summary_path, index=False)
+
+
+
+    # def run_and_update_scores(self):
+    #     langs, sbert_sims, vyakyarth_sims = [], [], []
+    #     # distiluse_sims, labse_sims = [], []
+    #     cohere_sims, voyage_sims = [], []
+    #     openai_sims = []
+    #     bert_scores, aggregated_sims = [], []
+
+    #     for ref, resp in zip(self.references, self.responses):
+    #         lang = self._detect_language(ref)
+    #         langs.append(lang)
+
+    #         sbert = self.compute_sbert_similarity(ref, resp)
+    #         # vyakyarth = self.compute_vyakyarth_similarity(ref, resp)
+    #         # distiluse = self.compute_distiluse_similarity(ref, resp)
+    #         # labse = self.compute_labse_similarity(ref, resp)
+    #         cohere = self.compute_cohere_similarity(ref, resp)
+    #         voyage = self.compute_voyage_similarity(ref, resp)
+    #         openai = self.compute_openai_similarity(ref, resp)
+    #         bert = self.compute_bert_score(ref, resp)
+
+    #         # Updated to only include active similarity methods (vyakyarth removed)
+    #         # average_sim = (sbert + cohere + voyage + bert) / 4.0
+
+    #         sbert_sims.append(sbert)
+    #         # vyakyarth_sims.append(vyakyarth)
+    #         # distiluse_sims.append(distiluse)
+    #         # labse_sims.append(labse)
+    #         cohere_sims.append(cohere)
+    #         voyage_sims.append(voyage)
+    #         openai_sims.append(openai)
+    #         bert_scores.append(bert)
+    #         # aggregated_sims.append(average_sim)
+
+    #     self.df["language"] = langs
+    #     self.df["sbert_similarity"] = sbert_sims
+    #     # self.df["vyakyarth_similarity"] = vyakyarth_sims
+    #     # self.df["distiluse_similarity"] = distiluse_sims
+    #     # self.df["labse_similarity"] = labse_sims
+    #     self.df["cohere_similarity"] = cohere_sims
+    #     self.df["voyage_similarity"] = voyage_sims
+    #     self.df["openai_similarity"] = openai_sims
+    #     self.df["bert_score_f1"] = bert_scores
+    #     # self.df["semantic_similarity"] = aggregated_sims
+
+    #     print("Semantic Similarity complete. Files ready for saving.")

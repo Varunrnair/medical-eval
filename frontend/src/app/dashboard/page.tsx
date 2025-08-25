@@ -56,6 +56,8 @@ export default function HomePage() {
     "Command-A": "/command-a-03-2025",
     "GPT-4o-mini": "/gpt-4o-mini-2024-07-18",
     "Llama-3.3-70B": "/Llama-3.3-70B-Instruct-Turbo",
+    "GPT-5-mini": "/gpt-5-mini-2025-08-07",
+    "Gemini-2.5-Flash": "/gemini-2.5-flash",
   };
 
   useEffect(() => {

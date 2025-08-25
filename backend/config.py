@@ -6,15 +6,16 @@ COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 INPUT_DATASET_PATH = "/Users/vrn/Work/medical-eval/backend/data/sample_15.csv"
 # model_name = "c4ai-aya-expanse-32b"
 # model_name = "command-a-03-2025"
-model_name = "gpt-4o-mini-2024-07-18"
-# model_name = "gemini-2.5-flash"
+# model_name = "gpt-4o-mini-2024-07-18"
+# model_name = "gpt-5-mini-2025-08-07"
+model_name = "gemini-2.5-flash"
 # model_name = "Llama-3.3-70B-Instruct-Turbo"
 QUESTION_COLUMN = "Questions"
-# JUDGE_MODEL = "gpt-4o-mini-2024-07-18"
-JUDGE_MODEL = "gemini-2.5-flash"
+JUDGE_MODEL = "gpt-4o-mini-2024-07-18"
+# JUDGE_MODEL = "gemini-2.5-flash"
 MAX_TOKENS = 1000
 TEMPERATURE = 0.1
-dataset_name = "usercontext2"
+dataset_name = "sakhi"
 
 
 FINAL_DATASET_PATH = f"/Users/vrn/Work/medical-eval/frontend/public/datasets/{dataset_name}/{model_name}/scored_final_dataset.csv"
