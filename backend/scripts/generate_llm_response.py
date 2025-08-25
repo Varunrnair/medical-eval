@@ -1,11 +1,11 @@
-#  Generating the llm response using llama  and then medical quality using gpt 4o mini
-
 import os
 import re
 import pandas as pd
 import cohere
 from openai import OpenAI 
 from together import Together
+from google import genai
+from google.genai import types
 from pathlib import Path
 from dotenv import load_dotenv
 from langdetect import detect
@@ -58,6 +58,9 @@ class PregnancyHealthLLM:
                 self.together_model_name = f"meta-llama/{self.model_name}"
             else:
                 self.together_model_name = self.model_name
+        elif "gemini" in model_lower:
+            self.provider = "gemini"
+            self.client = genai.Client(api_key=api_key)
         else:
             raise ValueError(f"Unsupported model name: {model_name}")
         self.prompt_template = USER_HISTORY2_PROMPT
@@ -86,14 +89,56 @@ class PregnancyHealthLLM:
                 detected_language=detected_language
             )
 
+        # if self.provider == "openai":
+        #     response = self.client.chat.completions.create(
+        #         model=self.model_name,
+        #         messages=[{"role": "user", "content": prompt}],
+        #         max_tokens=150,
+        #         temperature=0.7
+        #     )
+        #     return response.choices[0].message.content.strip()
+
         if self.provider == "openai":
-            response = self.client.chat.completions.create(
-                model=self.model_name,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=150,
-                temperature=0.7
-            )
-            return response.choices[0].message.content.strip()
+            if any(m in self.model_name for m in ["gpt-5", "gpt-4.1", "gpt-4o"]):
+                try:
+                    response = self.client.responses.create(
+                        model=self.model_name,
+                        input=prompt,
+                        max_completion_tokens=300,
+                        text={"verbosity": "low"},  # Optional: control response length
+                        reasoning={"effort": "low"}  # Optional: control reasoning effort
+                    )
+                    
+                    # Handle the response structure correctly
+                    if hasattr(response, "output_text") and response.output_text:
+                        return response.output_text.strip()
+                    elif hasattr(response, "output") and response.output:
+                        # Handle case where output is a list of response items
+                        if isinstance(response.output, list) and len(response.output) > 0:
+                            first_item = response.output[0]
+                            if hasattr(first_item, 'text'):
+                                return first_item.text.strip()
+                            elif hasattr(first_item, 'content') and isinstance(first_item.content, list):
+                                # Handle nested content structure
+                                for content_item in first_item.content:
+                                    if hasattr(content_item, 'text'):
+                                        return content_item.text.strip()
+                        return str(response.output).strip()
+                    else:
+                        return "⚠️ No text returned from GPT-5"
+                        
+                except Exception as e:
+                    print(f"GPT-5 API error: {e}")
+                    return f"⚠️ API Error: {str(e)}"
+            else:
+                # Use traditional chat completions for older GPT models
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=150,
+                    temperature=0.7
+                )
+                return response.choices[0].message.content.strip()
 
         elif self.provider == "cohere":
             response = self.client.chat(
@@ -119,6 +164,18 @@ class PregnancyHealthLLM:
                 return response["text"].strip()
             return str(response).strip()
 
+        elif self.provider == "gemini":
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    thinking_config=types.ThinkingConfig(thinking_budget=0)  # optional
+                )
+            )
+            return response.text.strip()
+        
+        return "No response generated."
+
 
 class PregnancyLLMResponder:
     def __init__(self, model_name: Optional[str] = None, api_key: Optional[str] = None):
@@ -128,7 +185,6 @@ class PregnancyLLMResponder:
             raise ValueError("No model_name provided and DEFAULT_MODEL_NAME is not set.")
         model_name_lower = self.model_name.lower()
 
-        # Select API key
         if api_key:
             chosen_key = api_key
         elif "gpt" in model_name_lower or "o1" in model_name_lower:
@@ -137,9 +193,11 @@ class PregnancyLLMResponder:
             chosen_key = os.getenv("COHERE_API_KEY")
         elif "llama" in model_name_lower or "together" in model_name_lower:
             chosen_key = os.getenv("TOGETHER_API_KEY")
+        elif "gemini" in model_name_lower:
+            chosen_key = os.getenv("GEMINI_API_KEY")
         else:
             chosen_key = (
-                os.getenv("OPENAI_API_KEY") or os.getenv("COHERE_API_KEY") or os.getenv("TOGETHER_API_KEY") )
+                os.getenv("OPENAI_API_KEY") or os.getenv("COHERE_API_KEY") or os.getenv("TOGETHER_API_KEY") or os.getenv("GEMINI_API_KEY") )
         if not chosen_key:
             raise ValueError("No valid API key found in environment variables for the requested model.")
         self.llm = PregnancyHealthLLM(chosen_key, self.model_name)
@@ -160,58 +218,3 @@ class PregnancyLLMResponder:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         df.to_csv(output_path, index=False)
         return df
-
-
-
-
-# class PregnancyHealthLLM:
-#     def __init__(self, api_key: str):
-#         # self.client = cohere.Client(api_key)
-#         self.client = OpenAI(api_key=api_key)
-#         # self.client = Together(api_key=api_key)
-#         self.prompt_template = TEST2_PROMPT
-
-#     def generate_response(self, row: dict, detected_language: str) -> str:
-#         prompt = self.prompt_template.format(
-#             user_history=row.get("User History", "No history provided"),
-#             question=row["Questions"],
-#             detected_language=detected_language
-#         )
-        
-#         # --- Cohere API call ---
-#         # response = self.client.chat(
-#         #     model=model_name,
-#         #     message=prompt,
-#         #     max_tokens=150,
-#         #     temperature=0.7
-#         # )
-#         # return response.text.strip()
-        
-#         # --- OpenAI API call (added) ---
-#         response = self.client.chat.completions.create(
-#             model=model_name,
-#             messages=[{"role": "user", "content": prompt}],
-#             max_tokens=150,
-#             temperature=0.7
-#         )
-#         return response.choices[0].message.content.strip()
-
-#         # together api call
-#         # try:
-#         #     response = self.client.chat.completions.create(
-#         #         model=model_name,                         
-#         #         messages=[
-#         #             {"role": "user", "content": prompt}
-#         #         ],
-#         #         max_tokens=150,
-#         #         temperature=0.7
-#         #     )
-#         #     # keep compatibility with OpenAI-like response shape
-#         #     text = response.choices[0].message.content if hasattr(response, "choices") else getattr(response, "text", None)
-#         #     if text is None:
-#         #         # some Together SDKs return plain text in response['text']
-#         #         text = response.get("text") if isinstance(response, dict) else str(response)
-#         #     return text.strip()
-#         # except Exception as e:
-#         #     # raise or return a helpful message — raising is better for batch processing to know failures
-#         #     raise RuntimeError(f"Together API request failed: {e}")
