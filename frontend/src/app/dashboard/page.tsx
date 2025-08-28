@@ -7,7 +7,6 @@ import { useModel } from "@/contexts/ModelContext";
 import BarChart from "@/components/charts/bar-chart";
 import ChartContainer from "@/components/charts/chart-container";
 
-
 type Metric = {
   key: string;
   displayName: string;
@@ -58,6 +57,14 @@ export default function HomePage() {
     "Llama-3.3-70B": "/Llama-3.3-70B-Instruct-Turbo",
     "GPT-5-mini": "/gpt-5-mini-2025-08-07",
     "Gemini-2.5-Flash": "/gemini-2.5-flash",
+  };
+
+  // 👇 New state: track visible models
+  const [visibleModels, setVisibleModels] = useState<string[]>(Object.keys(models));
+  const toggleModel = (model: string) => {
+    setVisibleModels((prev) =>
+      prev.includes(model) ? prev.filter((m) => m !== model) : [...prev, model]
+    );
   };
 
   useEffect(() => {
@@ -174,17 +181,19 @@ export default function HomePage() {
     if (metric.key) { 
       const key = metric.key; 
       const values: number[] = [];
-      Object.values(summaryData).forEach((summaryRows, idx) => {
-        const detailedRows = detailedData[Object.keys(summaryData)[idx]] || [];
-        const row =
-          selectedIndex === null
-            ? summaryRows[0]
-            : selectedIndex < detailedRows.length
-            ? detailedRows[selectedIndex]
-            : undefined;
-        const val = row?.[key]; 
-        if (typeof val === "number") values.push(val);
-      });
+      Object.entries(summaryData)
+        .filter(([model]) => visibleModels.includes(model))
+        .forEach(([model, summaryRows]) => {
+          const detailedRows = detailedData[model] || [];
+          const row =
+            selectedIndex === null
+              ? summaryRows[0]
+              : selectedIndex < detailedRows.length
+              ? detailedRows[selectedIndex]
+              : undefined;
+          const val = row?.[key]; 
+          if (typeof val === "number") values.push(val);
+        });
       if (values.length > 0) {
         metricExtremes[key] = { 
           min: Math.min(...values),
@@ -228,93 +237,113 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Scorecards */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 justify-center">
-          {Object.entries(summaryData).map(([model, summaryRows]) => {
-            const detailedRows = detailedData[model] || [];
-            const currentRow =
-              selectedIndex === null
-                ? summaryRows[0]
-                : detailedRows[selectedIndex] || undefined;
-
-            if (!currentRow) return null;
-
-            return (
-              <div
-                key={model}
-                className="flex flex-col rounded-xl border border-neutral-800 bg-neutral-900/50 p-6 min-h-[420px]"
-              >
-                <h1 className="mb-6 text-xl font-semibold">{model}</h1>
-                <div className="flex flex-col gap-3 text-sm">
-                  {metricConfig.map((metric, index) => {
-                    if (metric.type === "heading") {
-                      return (
-                        <div
-                          key={`heading-${index}`}
-                          className="pt-3 text-md font-semibold text-neutral-300"
-                        >
-                          {metric.displayName}
-                        </div>
-                      );
-                    } else {
-                      const value = currentRow[metric.key];
-                      if (value !== undefined && value !== null) {
-                        const extremes = metricExtremes[metric.key];
-                        const highlightClass =
-                          extremes && typeof value === "number"
-                            ? value === extremes.max
-                              ? "text-green-500 font-bold"
-                              : value === extremes.min
-                              ? "text-red-500 font-bold"
-                              : ""
-                            : "";
-                        return (
-                          <div
-                            key={metric.key}
-                            className="grid grid-cols-2 items-center gap-4"
-                          >
-                            <span className="text-neutral-400">
-                              {metric.displayName}
-                            </span>
-                            <span
-                              className={`font-mono text-right ${highlightClass}`}
-                            >
-                              {typeof value === "number"
-                                ? value.toFixed(6)
-                                : String(value)}
-                            </span>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }
-                  })}
-                </div>
-              </div>
-            );
-          })}
+        {/* Model Selector */}
+        <div className="mb-8 flex flex-wrap gap-3 justify-center">
+          {Object.keys(models).map((model) => (
+            <button
+              key={model}
+              onClick={() => toggleModel(model)}
+              className={`px-4 py-2 rounded-full border transition ${
+                visibleModels.includes(model)
+                  ? "bg-blue-600 text-white border-blue-500"
+                  : "bg-neutral-800 text-neutral-400 border-neutral-700"
+              }`}
+            >
+              {visibleModels.includes(model) ? `✓ ${model}` : model}
+            </button>
+          ))}
         </div>
 
-        {/* ------------------- GRAPHS SECTION (MODIFIED) ------------------- */}
+        {/* Scorecards */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 justify-center">
+          {Object.entries(summaryData)
+            .filter(([model]) => visibleModels.includes(model))
+            .map(([model, summaryRows]) => {
+              const detailedRows = detailedData[model] || [];
+              const currentRow =
+                selectedIndex === null
+                  ? summaryRows[0]
+                  : detailedRows[selectedIndex] || undefined;
+
+              if (!currentRow) return null;
+
+              return (
+                <div
+                  key={model}
+                  className="flex flex-col rounded-xl border border-neutral-800 bg-neutral-900/50 p-6 min-h-[420px]"
+                >
+                  <h1 className="mb-6 text-xl font-semibold">{model}</h1>
+                  <div className="flex flex-col gap-3 text-sm">
+                    {metricConfig.map((metric, index) => {
+                      if (metric.type === "heading") {
+                        return (
+                          <div
+                            key={`heading-${index}`}
+                            className="pt-3 text-md font-semibold text-neutral-300"
+                          >
+                            {metric.displayName}
+                          </div>
+                        );
+                      } else {
+                        const value = currentRow[metric.key];
+                        if (value !== undefined && value !== null) {
+                          const extremes = metricExtremes[metric.key];
+                          const highlightClass =
+                            extremes && typeof value === "number"
+                              ? value === extremes.max
+                                ? "text-green-500 font-bold"
+                                : value === extremes.min
+                                ? "text-red-500 font-bold"
+                                : ""
+                              : "";
+                          return (
+                            <div
+                              key={metric.key}
+                              className="grid grid-cols-2 items-center gap-4"
+                            >
+                              <span className="text-neutral-400">
+                                {metric.displayName}
+                              </span>
+                              <span
+                                className={`font-mono text-right ${highlightClass}`}
+                              >
+                                {typeof value === "number"
+                                  ? value.toFixed(6)
+                                  : String(value)}
+                              </span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+
+        {/* Graphs Section */}
         <div className="mt-16">
           {(() => {
-            // Define a consistent color palette for the models
-            const modelColors = Object.keys(models).map(
+            const visibleModelKeys = Object.keys(models).filter((m) =>
+              visibleModels.includes(m)
+            );
+            const modelColors = visibleModelKeys.map(
               (_, idx) => `hsl(${(idx * 90) % 360}, 70%, 50%)`
             );
 
-            // Define shared chart options for a more granular Y-axis
             const chartOptions = {
               scales: {
                 y: {
                   beginAtZero: true,
-                  min: 0, // Set a fixed minimum for the Y-axis
-                  max: 1, // Set a fixed maximum for the Y-axis
+                  min: 0,
+                  max: 1,
                 },
               },
               plugins: {
                 legend: {
-                  display: false, // Hide legend as title is sufficient
+                  display: false,
                 },
               },
             };
@@ -337,26 +366,25 @@ export default function HomePage() {
                   <h2 className="mb-8 text-3xl font-bold border-b border-neutral-700 pb-2">
                     {section.displayName}
                   </h2>
-                  {/* MODIFIED: Grid layout updated to make graphs smaller */}
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                     {sectionMetrics.map((metric) => {
                       const chartData = {
-                        labels: Object.keys(models),
+                        labels: visibleModelKeys,
                         datasets: [
                           {
                             label: metric.displayName,
-                            data: Object.entries(summaryData).map(
-                              ([model, rows]) => {
-                                const detailedRows = detailedData[model];
-                                const row =
-                                    selectedIndex != null && detailedRows && selectedIndex < detailedRows.length
-                                        ? detailedRows[selectedIndex]
-                                        : rows[0];
-                                const value = (row?.[metric.key] as number) ?? 0;
-                                return value;
-                              }
-                            ),
-                            backgroundColor: modelColors, // Assigns a different color per model
+                            data: visibleModelKeys.map((model) => {
+                              const rows = summaryData[model];
+                              const detailedRows = detailedData[model];
+                              const row =
+                                selectedIndex != null &&
+                                detailedRows &&
+                                selectedIndex < detailedRows.length
+                                  ? detailedRows[selectedIndex]
+                                  : rows?.[0];
+                              return (row?.[metric.key] as number) ?? 0;
+                            }),
+                            backgroundColor: modelColors,
                           },
                         ],
                       };
@@ -366,7 +394,6 @@ export default function HomePage() {
                           key={metric.key}
                           title={metric.displayName}
                         >
-                          {/* MODIFIED: Pass custom options for Y-axis scaling */}
                           <BarChart data={chartData} options={chartOptions} />
                         </ChartContainer>
                       );

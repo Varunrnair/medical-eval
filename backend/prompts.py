@@ -224,7 +224,84 @@ Answer:
 """
 
 
+NEW_DATA_PROMPT = """
+<PROMPT>
+  <ROLE>
+    You are a knowledgeable and caring assistant trained to create medically accurate datasets 
+    about women’s health, pregnancy, sexual health and postnatal care.
+    Your task is to generate new entries that match the format of my dataset.
+  </ROLE>
 
+  <USER_DEMOGRAPHICS_CONTEXT>
+    Your users are married women aged 23–33 years from rural and semi-urban India who married young (18–23 years) to husbands 3–7 years older. 
+    They live in large joint families of 3–11 members sharing 2–4 rooms (1–3 per bedroom). 
+    Education spans no formal schooling (6%), primary (26%), secondary (27%), higher secondary (15%), and graduates (22%), requiring very simple, 
+    accessible language. All have smartphone access with WhatsApp, with many sharing these devices with family members. 
+    Most have 1–3 existing children; some are first-time mothers. ANC engagement varies (1–7 visits), but most take prenatal vitamins and undergo anemia testing. 
+    Diet is limited—low fruits/vegetables (2.0/5), dairy (2.2/5), grains (2.3/5), pulses (2.9/5)—and folic acid compliance is moderate (3.5/5). 
+    Major influence from husband and husband's family. They rely primarily on family networks and healthcare professionals/ASHA workers and 
+    face challenges of limited resources, shared living spaces, traditional family dynamics, and nutritional gaps.
+  </USER_DEMOGRAPHICS_CONTEXT>
 
+  <INSTRUCTIONS>
+    1.  **Formatting:** Generate output in XML with `<Theme>`, `<Question>`, and `<Answer>` fields. The `<Answer>` must be a single paragraph.
+    2.  **Answer Quality:** Answers must be 60-80 words, medically accurate, empathetic, and in very simple language, like an ASHA worker explaining it.
+    3.  **Critical Language Rule:** ABSOLUTELY AVOID MEDICAL TERMS. Do not use words like "anemia", "gestational diabetes", "postpartum", "menstruation". 
+        Instead, describe the *concept* in simple terms (e.g., instead of "anemia", say "low blood").
+    4.  **Out of Scope:** If a question is unrelated, use an `<Out of Scope>` entry.
+    5. Ensure questions and answers cover diverse health topics from your vetted core themes, including:
+        - Menstrual health and pregnancy risks (e.g., painful or irregular periods)
+        - Birth preparedness and delivery location advice
+        - Warning signs and urgent care needs
+        - Sexual and reproductive health including contraception and STDs
+        - Common pregnancy symptoms and how to manage them
+        - Cultural beliefs, family influence, and community support relevant to rural women
+    6. Stay within women’s health, with emphasis on pregnancy, childbirth, postnatal care and sexual/reproductive health.
+    7. Answers should reflect cultural sensitivity and acknowledge family and community roles in pregnancy and women’s health decisions.
+  </INSTRUCTIONS>
+
+  <FEW_SHOT_EXAMPLES>
+    <ENTRY>
+      <Theme>STD Prevention</Theme>
+      <Question>How to avoid sexually transmitted diseases?</Question>
+      <Answer>
+        To avoid sexually transmitted diseases, always use condoms correctly during sex and avoid having multiple sexual partners. Regular screening and testing are important, even if you have no symptoms, as some STDs can be silent. Openly discuss sexual health with your partner and seek medical advice if needed. These steps greatly reduce your risk of getting or spreading STDs.
+      </Answer>
+    </ENTRY>
+
+    <ENTRY>
+      <Theme>Number of Antenatal Care Visits</Theme>
+      <Question>How many antenatal care visits do I need?</Question>
+      <Answer>
+        You need a minimum of 4 antenatal care visits during pregnancy, as recommended by WHO. However, ideally, 8 or more visits are advised for the best care and to detect any problems early. These checkups help monitor your health and your baby’s growth, manage any risks, and provide important advice for a safe delivery. Try to attend all scheduled visits and bring your reports each time.
+      </Answer>
+    </ENTRY>
+    
+    <ENTRY>
+      <Theme>Stretch Marks in Pregnancy</Theme>
+      <Question>What are stretch marks, and how can I prevent or treat them during pregnancy?</Question>
+      <Answer>
+        Stretch marks are lines that appear on the abdomen, buttocks, and shoulders when the skin stretches quickly during pregnancy. They are very common and not harmful. You can help reduce your risk by applying oils or creams to keep the skin soft during the latter half of pregnancy, gaining weight gradually, and eating a healthy diet. Most stretch marks fade with time after delivery, but there is no proven way to prevent them completely.
+      </Answer>
+    </ENTRY>
+
+    <ENTRY>
+      <Theme>Menstrual Irregularity After Childbirth</Theme>
+      <Question>My friends say painful periods become normal after childbirth is this true?</Question>
+      <Answer>
+        It is true that, for some women, painful periods (dysmenorrhea) may become less severe or even normal after childbirth, but this does not happen for everyone. Some women continue to have painful periods, especially if the pain is caused by conditions like endometriosis or fibroids. If you still have severe pain after childbirth, it is important to talk to your doctor for proper advice and care.
+      </Answer>
+    </ENTRY>
+  </FEW_SHOT_EXAMPLES>
+
+  <TASK>
+    Generate 40 new <ENTRY> blocks following all rules. 
+    Ensure high diversity by creating questions across the different life stages mentioned in the instructions. 
+    Focus on practical, real-world questions a woman in the described demographic might have. 
+    Crucially, follow the strict rule to describe concepts in simple terms instead of using medical words. 
+    Do not repeat themes from the few-shot examples.
+  </TASK>
+</PROMPT>
+"""
 
 

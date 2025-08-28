@@ -39,7 +39,7 @@ class LanguageDetector:
 
 
 class PregnancyHealthLLM:
-    def __init__(self, api_key: str, model_name: str, prompt_type: str = "user_history2"):
+    def __init__(self, api_key: str, model_name: str, prompt_type: str = "user_history1"):
         if not model_name:
             raise ValueError("model_name must be provided to initialize PregnancyHealthLLM.")
         self.model_name = model_name
@@ -63,7 +63,7 @@ class PregnancyHealthLLM:
             self.client = genai.Client(api_key=api_key)
         else:
             raise ValueError(f"Unsupported model name: {model_name}")
-        self.prompt_template = USER_HISTORY2_PROMPT
+        self.prompt_template = USER_HISTORY1_PROMPT
 
 
     def generate_response(self, row: dict, detected_language: str) -> str:
@@ -104,7 +104,6 @@ class PregnancyHealthLLM:
                     response = self.client.responses.create(
                         model=self.model_name,
                         input=prompt,
-                        max_completion_tokens=300,
                         text={"verbosity": "low"},  # Optional: control response length
                         reasoning={"effort": "low"}  # Optional: control reasoning effort
                     )
